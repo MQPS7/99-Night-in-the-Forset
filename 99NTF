@@ -35,9 +35,11 @@ EquipItemHandle:FireServer(unpack(args))
 local NewOld_Axe = Old_Axe:Clone()
 local OldAxe_WeldConstraint = Instance.new("WeldConstraint", NewOld_Axe.PrimaryPart)
 NewOld_Axe.Parent = character
-NewOld_Axe.PrimaryPart.CFrame = HMNRT.CFrame
+NewOld_Axe.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(0,2,0)
 OldAxe_WeldConstraint.Part0 = NewOld_Axe.PrimaryPart
 OldAxe_WeldConstraint.Part1 = HMNRT
+
+local Stop_Evreything = false
 
 task.spawn(function()
 	while wait(1) do
@@ -45,6 +47,14 @@ task.spawn(function()
 			wait(3)
 			game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("AcceptPlayAgain"):FireServer()
 		end
+		if humanoid.Health < 30 then
+			Stop_Evreything = false
+		else
+			Stop_Evreything = false
+		end
+		if Stop_Evreything == true then
+			HMNRT.CFrame = HMNRT.CFrame * CFrame.new(math.random(-10,10),120,math.random(-10,10))
+		end		
 	end
 end)
 
@@ -55,10 +65,10 @@ task.spawn(function()
 		if HungerBar and HungerBar.Size.X.Scale < 0.2 then
 			Auto_FOOD = true
 		end
-		if Auto_FOOD == true then
+		if Auto_FOOD == true and Stop_Evreything == false then
 			for _, Model in ipairs(workspace.Items:GetChildren()) do
 				if Model.Name == "Carrot" or Model.Name == "Berry" then
-					if Auto_FOOD == true and Model.PrimaryPart then
+					if Auto_FOOD == true and Stop_Evreything == false and Model.PrimaryPart then
 						HMNRT.CFrame = Model.PrimaryPart.CFrame * CFrame.new(0,10,0)
 						wait(0.1)
 						RequestStartDraggingItem:FireServer(Model)
@@ -143,7 +153,7 @@ task.spawn(function()
 					end					
 				end
 			end
-			if nearest and nearestDistance < 120 and Auto_FOOD == false then
+			if nearest and nearestDistance < 120 and Auto_FOOD == false and Stop_Evreything == false then
 				local Humanoid = nearest:FindFirstChild("NPC")
 				local RootPart = nearest:FindFirstChild("HumanoidRootPart")
 				if OnTopEnameis == true then
@@ -163,15 +173,17 @@ local orbitRadius = 10
 local orbitSpeed = 100
 
 RunService.RenderStepped:Connect(function(dt)
-	if not SpinFind_StrongHold or not InnerTouchZone then return end
-	orbitTime = orbitTime + dt
-	local angle = math.rad(orbitSpeed) * orbitTime
-	local offset = Vector3.new(math.cos(angle) * orbitRadius, 100, math.sin(angle) * orbitRadius)
-	local newPos = InnerTouchZone.Position + offset
-	if HMNRT then
-		HMNRT.CFrame = CFrame.new(newPos)
-		orbitRadius = orbitRadius + 2
-		orbitSpeed = orbitSpeed + 0.0001
+	if Stop_Evreything == false then
+		if not SpinFind_StrongHold or not InnerTouchZone then return end
+		orbitTime = orbitTime + dt
+		local angle = math.rad(orbitSpeed) * orbitTime
+		local offset = Vector3.new(math.cos(angle) * orbitRadius, 100, math.sin(angle) * orbitRadius)
+		local newPos = InnerTouchZone.Position + offset
+		if HMNRT then
+			HMNRT.CFrame = CFrame.new(newPos)
+			orbitRadius = orbitRadius + 2
+			orbitSpeed = orbitSpeed + 0.0001
+		end
 	end
 end)
 
@@ -196,6 +208,11 @@ task.spawn(function()
 									wait(0.1)
 								until Auto_FOOD == false
 							end
+							if Stop_Evreything == true then
+								repeat
+									wait(0.1)
+								until Stop_Evreything == false
+							end
 							if Main and Main:FindFirstChild("ProximityAttachment") then
 								local ProximityAttachment = Main:FindFirstChild("ProximityAttachment")
 								if ProximityAttachment and ProximityAttachment:FindFirstChild("ProximityInteraction") then
@@ -208,7 +225,7 @@ task.spawn(function()
 								end
 							end
 							for _, Model in ipairs(workspace.Items:GetChildren()) do
-								if Model.Name == "Diamond" or Model.Name == "Cultist Gem" then
+								if Model.Name == "Diamond" then
 									if Model.PrimaryPart and Auto_FOOD == false then
 										HMNRT.CFrame = Model.PrimaryPart.CFrame
 										wait(0.1)
