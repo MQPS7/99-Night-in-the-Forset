@@ -128,18 +128,20 @@ Close_Button.Activated:Connect(function()
 end)
 
 local function Create_Log(Text)
-	local dateTime = os.date("*t")
-	local formattedTime = string.format("%02d/%02d/%04d %02d:%02d:%02d",
-		dateTime.day, dateTime.month, dateTime.year,
-		dateTime.hour, dateTime.min, dateTime.sec)
-	local MainLogFrame = MakeFrame(ScreenGui, UDim2.new(0, 400,0, 31)
-		, UDim2.new(0, 0,0, 0), 0
-		, Color3.new(0.227451, 0.227451, 0.227451), false, true, 0)		
-	local textbabel = MakeText(MainLogFrame, UDim2.new(0, 265,0, 19), UDim2.new(0.31, 0,0.176, 0), 1, Color3.new(1, 1, 1), true, Text)
-	local timelabel = MakeText(MainLogFrame, UDim2.new(0, 88,0, 19), UDim2.new(0.027, 0,0.176, 0), 1, Color3.new(1, 1, 1), true, formattedTime)
-	MainLogFrame.Name = "Delete_in_" .. math.floor(Tick_Log_Delete) + 4
-	MainLogFrame.Parent = LogFrame
-	MainLogFrame.Visible = true
+	pcall(function()
+		local dateTime = os.date("*t")
+		local formattedTime = string.format("%02d/%02d/%04d %02d:%02d:%02d",
+			dateTime.day, dateTime.month, dateTime.year,
+			dateTime.hour, dateTime.min, dateTime.sec)
+		local MainLogFrame = MakeFrame(ScreenGui, UDim2.new(0, 400,0, 31)
+			, UDim2.new(0, 0,0, 0), 0
+			, Color3.new(0.227451, 0.227451, 0.227451), false, true, 0)		
+		local textbabel = MakeText(MainLogFrame, UDim2.new(0, 265,0, 19), UDim2.new(0.31, 0,0.176, 0), 1, Color3.new(1, 1, 1), true, Text)
+		local timelabel = MakeText(MainLogFrame, UDim2.new(0, 88,0, 19), UDim2.new(0.027, 0,0.176, 0), 1, Color3.new(1, 1, 1), true, formattedTime)
+		MainLogFrame.Name = "Delete_in_" .. math.floor(Tick_Log_Delete) + 4
+		MainLogFrame.Parent = LogFrame
+		MainLogFrame.Visible = true
+	end)
 end
 
 --***** Start Auto Farm *****--
@@ -189,18 +191,20 @@ task.spawn(function()
 				HMNRT.CFrame = Main_CFrame * CFrame.new(math.random(-10,10),120,math.random(-10,10))
 				wait(1)
 				if Inventory:FindFirstChild("Bandage") then
-					local OnlyBandageargs = {Inventory:WaitForChild("Bandage")}
-					local Bandage = Inventory:WaitForChild("Bandage")
-					local Bandage_args = {"FireAllClients",Inventory:FindFirstChild("Bandage")}
-					local NewBandage = Bandage:Clone()
-					local Bandage_args_WeldConstraint = Instance.new("WeldConstraint", NewBandage.PrimaryPart)
-					NewBandage.PrimaryPart.CFrame = HMNRT.CFrame
-					Bandage_args_WeldConstraint.Part0 = NewBandage.PrimaryPart
-					Bandage_args_WeldConstraint.Part1 = HMNRT
-					EquipItemHandle:FireServer(unpack(Bandage_args))
-					NewBandage.Parent = character
-					wait(1)
-					RequestConsumeItem:InvokeServer(OnlyBandageargs)
+					pcall(function()
+						local OnlyBandageargs = {Inventory:WaitForChild("Bandage")}
+						local Bandage = Inventory:WaitForChild("Bandage")
+						local Bandage_args = {"FireAllClients",Inventory:FindFirstChild("Bandage")}
+						local NewBandage = Bandage:Clone()
+						local Bandage_args_WeldConstraint = Instance.new("WeldConstraint", NewBandage.PrimaryPart)
+						NewBandage.PrimaryPart.CFrame = HMNRT.CFrame
+						Bandage_args_WeldConstraint.Part0 = NewBandage.PrimaryPart
+						Bandage_args_WeldConstraint.Part1 = HMNRT
+						EquipItemHandle:FireServer(unpack(Bandage_args))
+						NewBandage.Parent = character
+						wait(1)
+						RequestConsumeItem:InvokeServer(OnlyBandageargs)
+					end)
 				else
 					for _, Model in ipairs(workspace.Items:GetChildren()) do
 						if Stop_Evreything == true and Model.PrimaryPart and  Model.Name == "Bandage"  then
@@ -229,17 +233,20 @@ end)
 
 task.spawn(function()
 	local AcceptPlayAgain = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("AcceptPlayAgain")
-	while wait(0.1) do
-		if humanoid.Health <= 0 then
-			for i=1,100 do
-				AcceptPlayAgain:FireServer()
-				Create_Log("เล่นอีกรอบ")
-				wait(0.5)
+	
+	while wait(0.05) do
+		pcall(function()
+			if humanoid.Health <= 0 then
+				for i=1,100 do
+					AcceptPlayAgain:FireServer()
+					Create_Log("เล่นอีกรอบ")
+					wait(0.1)
+				end
 			end
-		end
-		if humanoid.Health < 40 then
-			Stop_Evreything = true
-		end
+			if humanoid.Health < 40 then
+				Stop_Evreything = true
+			end
+		end)
 	end
 end)
 
@@ -252,24 +259,26 @@ task.spawn(function()
 		if Auto_FOOD == true and Stop_Evreything == false then
 			for _, Model in ipairs(workspace.Items:GetChildren()) do
 				if Model.Name == "Carrot" or Model.Name == "Berry" then
-					Create_Log("กิน " .. Model.Name)
-					if Auto_FOOD == true and Stop_Evreything == false and Model.PrimaryPart then
-						wait(0.1)
-						HMNRT.CFrame = Model.PrimaryPart.CFrame * CFrame.new(0,10,0)
-						wait(0.1)
-						RequestStartDraggingItem:FireServer(Model)
-						wait(0.1)
-						RequestConsumeItem:InvokeServer(Model)
-						wait(0.1)
-						StopDraggingItem:FireServer(Model)
-						wait(0.1)
-						RequestStartDraggingItem:FireServer(Model)
-						wait(0.1)
-						StopDraggingItem:FireServer(Model)
-						if HungerBar.Size.X.Scale > 0.9 then
-							Auto_FOOD = false
+					pcall(function()
+						Create_Log("กิน " .. Model.Name)
+						if Auto_FOOD == true and Stop_Evreything == false and Model.PrimaryPart then
+							wait(0.1)
+							HMNRT.CFrame = Model.PrimaryPart.CFrame * CFrame.new(0,10,0)
+							wait(0.1)
+							RequestStartDraggingItem:FireServer(Model)
+							wait(0.1)
+							RequestConsumeItem:InvokeServer(Model)
+							wait(0.1)
+							StopDraggingItem:FireServer(Model)
+							wait(0.1)
+							RequestStartDraggingItem:FireServer(Model)
+							wait(0.1)
+							StopDraggingItem:FireServer(Model)
+							if HungerBar.Size.X.Scale > 0.9 then
+								Auto_FOOD = false
+							end
 						end
-					end
+					end)
 				end
 			end
 		end
@@ -297,22 +306,24 @@ task.spawn(function()
 						Kill_Aura_Farm = true -- true
 					else
 						if Auto_Add_Feul == true and Model.PrimaryPart then
-							Create_Log("เติมไฟ")
-							wait(0.2)
-							local mainPart = Model.PrimaryPart
-							HMNRT.CFrame = mainPart.CFrame * CFrame.new(0,10,0)
-							wait(0.2)					
-							RequestStartDraggingItem:FireServer(Model)
-							wait(0.2)
-							HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,10,0)
-							wait(0.2)
-							StopDraggingItem:FireServer(Model)
-							wait(0.2)
-							mainPart.CFrame = InnerTouchZone.CFrame * CFrame.new(0,10,0)
-							wait(0.1)
-							RequestStartDraggingItem:FireServer(Model)
-							wait(0.2)
-							StopDraggingItem:FireServer(Model)
+							pcall(function()
+								Create_Log("เติมไฟ")
+								wait(0.2)
+								local mainPart = Model.PrimaryPart
+								HMNRT.CFrame = mainPart.CFrame * CFrame.new(0,10,0)
+								wait(0.2)					
+								RequestStartDraggingItem:FireServer(Model)
+								wait(0.2)
+								HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,10,0)
+								wait(0.2)
+								StopDraggingItem:FireServer(Model)
+								wait(0.2)
+								mainPart.CFrame = InnerTouchZone.CFrame * CFrame.new(0,10,0)
+								wait(0.1)
+								RequestStartDraggingItem:FireServer(Model)
+								wait(0.2)
+								StopDraggingItem:FireServer(Model)
+							end)
 						end
 					end
 				end
@@ -332,27 +343,31 @@ task.spawn(function()
 			local nearest = nil
 			local nearestDistance = math.huge
 			for _, obj in pairs(workspace.Characters:GetDescendants()) do
-				if obj.Name == "Cultist" or obj.Name == "Crossbow Cultist" 
-					or obj.Name == "Wolf" or obj.Name == "Bear" or obj.Name == "Alpha Wolf" then
-					if obj:IsA("Model") and obj:FindFirstChild("NPC") and obj:FindFirstChild("HumanoidRootPart") then
-						local dist = (obj.HumanoidRootPart.Position - StrongHold_Locate.PrimaryPart.Position).Magnitude
-						if dist < nearestDistance then
-							nearestDistance = dist
-							nearest = obj
-						end
-					end					
-				end
+				pcall(function()
+					if obj.Name == "Cultist" or obj.Name == "Crossbow Cultist" 
+						or obj.Name == "Wolf" or obj.Name == "Bear" or obj.Name == "Alpha Wolf" then
+						if obj:IsA("Model") and obj:FindFirstChild("NPC") and obj:FindFirstChild("HumanoidRootPart") then
+							local dist = (obj.HumanoidRootPart.Position - StrongHold_Locate.PrimaryPart.Position).Magnitude
+							if dist < nearestDistance then
+								nearestDistance = dist
+								nearest = obj
+							end
+						end					
+					end
+				end)
 			end
 			if nearest and nearestDistance < 120 and Auto_FOOD == false and Stop_Evreything == false then
-				local Humanoid = nearest:FindFirstChild("NPC")
-				local RootPart = nearest:FindFirstChild("HumanoidRootPart")
-				if OnTopEnameis == true then
-					HMNRT.CFrame = RootPart.CFrame * CFrame.new(0,120,0)
-				end				
-				local Kill_args = {nearest,player:WaitForChild("Inventory"):WaitForChild("Old Axe"),"3_8880410317",
-					CFrame.new(RootPart.Position.X, RootPart.Position.Y, RootPart.Position.Z, 0.6668938994407654, 0.32279011607170105, -0.6716093420982361, -2.5697719507888905e-08, 0.901304304599762, 0.43318650126457214, 0.7451527118682861, -0.28888940811157227, 0.6010743379592896)
-				}
-				ToolDamageObject:InvokeServer(unpack(Kill_args))
+				pcall(function()
+					local Humanoid = nearest:FindFirstChild("NPC")
+					local RootPart = nearest:FindFirstChild("HumanoidRootPart")
+					if OnTopEnameis == true then
+						HMNRT.CFrame = RootPart.CFrame * CFrame.new(0,120,0)
+					end				
+					local Kill_args = {nearest,player:WaitForChild("Inventory"):WaitForChild("Old Axe"),"3_8880410317",
+						CFrame.new(RootPart.Position.X, RootPart.Position.Y, RootPart.Position.Z, 0.6668938994407654, 0.32279011607170105, -0.6716093420982361, -2.5697719507888905e-08, 0.901304304599762, 0.43318650126457214, 0.7451527118682861, -0.28888940811157227, 0.6010743379592896)
+					}
+					ToolDamageObject:InvokeServer(unpack(Kill_args))
+				end)
 			end
 		end
 	end
@@ -364,16 +379,18 @@ local orbitSpeed = 100
 
 RunService.RenderStepped:Connect(function(dt)
 	if Stop_Evreything == false then
-		if not SpinFind_StrongHold or not InnerTouchZone then return end
-		orbitTime = orbitTime + dt
-		local angle = math.rad(orbitSpeed) * orbitTime
-		local offset = Vector3.new(math.cos(angle) * orbitRadius, 100, math.sin(angle) * orbitRadius)
-		local newPos = InnerTouchZone.Position + offset
-		if HMNRT then
-			HMNRT.CFrame = CFrame.new(newPos)
-			orbitRadius = orbitRadius + 2
-			orbitSpeed = orbitSpeed + 0.0001
-		end
+		pcall(function()
+			if not SpinFind_StrongHold or not InnerTouchZone then return end
+			orbitTime = orbitTime + dt
+			local angle = math.rad(orbitSpeed) * orbitTime
+			local offset = Vector3.new(math.cos(angle) * orbitRadius, 100, math.sin(angle) * orbitRadius)
+			local newPos = InnerTouchZone.Position + offset
+			if HMNRT then
+				HMNRT.CFrame = CFrame.new(newPos)
+				orbitRadius = orbitRadius + 2
+				orbitSpeed = orbitSpeed + 0.0001
+			end
+		end)
 	end
 end)
 
@@ -388,7 +405,7 @@ task.spawn(function()
 					local TriggerZone1 = Functional:FindFirstChild("EnemyWaves12"):FindFirstChild("Wave1"):FindFirstChild("TriggerZone")
 					local TriggerZone2 = Functional:FindFirstChild("EnemyWaves345"):FindFirstChild("Wave1"):FindFirstChild("TriggerZone")
 					if Functional then
-						workspace.Gravity = 1
+						workspace.Gravity = .5
 						OnTopEnameis = false
 						if workspace:FindFirstChild("Items"):FindFirstChild("Stronghold Diamond Chest") then
 							local Main = workspace:FindFirstChild("Items"):FindFirstChild("Stronghold Diamond Chest"):FindFirstChild("Main")
@@ -407,34 +424,40 @@ task.spawn(function()
 								if ProximityAttachment and ProximityAttachment:FindFirstChild("ProximityInteraction") then
 									local Stronghold_Diamond_Chest = ProximityAttachment:FindFirstChild("ProximityInteraction")
 									if Stronghold_Diamond_Chest then
-										HMNRT.CFrame = Stronghold_Diamond_Chest.Parent.WorldCFrame							
-										wait(0.05)
-										fireproximityprompt(Stronghold_Diamond_Chest)
+										pcall(function()
+											HMNRT.CFrame = Stronghold_Diamond_Chest.Parent.WorldCFrame							
+											wait(0.05)
+											fireproximityprompt(Stronghold_Diamond_Chest)
+										end)
 									end
 								end
 							end
 							for _, Model in ipairs(workspace.Items:GetChildren()) do
 								if Model.Name == "Diamond" then
-									Create_Log("เก็บเพชร")
-									if Model.PrimaryPart and Auto_FOOD == false then
-										wait(0.1)
-										HMNRT.CFrame = Model.PrimaryPart.CFrame
-										wait(0.1)
-										RequestStartDraggingItem:FireServer(Model)
-										wait(0.1)
-										RequestHotbarItem:InvokeServer(Model)
-										wait(0.1)
-										StopDraggingItem:FireServer(Model)
-									end
-									wait()
+									pcall(function()
+										Create_Log("เก็บเพชร")
+										if Model.PrimaryPart and Auto_FOOD == false then
+											wait(0.1)
+											HMNRT.CFrame = Model.PrimaryPart.CFrame
+											wait(0.1)
+											RequestStartDraggingItem:FireServer(Model)
+											wait(0.1)
+											RequestHotbarItem:InvokeServer(Model)
+											wait(0.1)
+											StopDraggingItem:FireServer(Model)
+										end
+										wait()
+									end)
 								end
 							end
 						end
 						if TriggerZone1 and TriggerZone2 then
-							wait(0.05)
-							HMNRT.CFrame = TriggerZone1.CFrame
-							wait(0.05)
-							HMNRT.CFrame = TriggerZone2.CFrame
+							pcall(function()
+								wait(0.05)
+								HMNRT.CFrame = TriggerZone1.CFrame
+								wait(0.05)
+								HMNRT.CFrame = TriggerZone2.CFrame
+							end)
 						end
 						wait(0.05)
 						OnTopEnameis = true
