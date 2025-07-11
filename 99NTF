@@ -1,1 +1,455 @@
 
+local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+local replicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+
+local player = game.Players.LocalPlayer
+local character = player.Character
+local humanoid = character:FindFirstChildOfClass("Humanoid")
+local HMNRT = character:FindFirstChild("HumanoidRootPart")
+local Camera = workspace.CurrentCamera
+local plrGui = player.PlayerGui
+
+local ScreenGui = Instance.new("ScreenGui", plrGui)
+
+local function MakeTextButton(Parent, Size, Posi, BGtran, Color, Text)
+	local NewFrame = Instance.new("TextButton", Parent)
+	NewFrame.Position = Posi
+	NewFrame.Size = Size
+	NewFrame.BackgroundTransparency = BGtran
+	NewFrame.Text = Text
+	NewFrame.TextScaled = true
+	NewFrame.TextColor3 = Color
+	NewFrame.Font = Enum.Font.Code
+	return NewFrame
+end
+
+local function MakeText(Parent, Size, Posi, BGtran, Color, Visible, Text)
+	local NewFrame = Instance.new("TextLabel", Parent)
+	local UIStroke_NewFrame = Instance.new("UIStroke", NewFrame)
+	UIStroke_NewFrame.Thickness = 3.1
+	UIStroke_NewFrame.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+	NewFrame.Position = Posi
+	NewFrame.Size = Size	
+	NewFrame.TextColor3 = Color
+	NewFrame.BackgroundTransparency = BGtran
+	NewFrame.Visible = Visible
+	NewFrame.Text = Text
+	NewFrame.TextScaled = true
+	NewFrame.Font = Enum.Font.Code
+	return NewFrame
+end
+
+local function MakeFrame(Parent, Size, Posi, BGtran, Color, Visible, UiConner, Zindex)
+	local NewFrame = Instance.new("Frame", Parent)
+	NewFrame.Position = Posi
+	NewFrame.Size = Size	
+	NewFrame.BackgroundColor3 = Color
+	NewFrame.BackgroundTransparency = BGtran
+	NewFrame.Visible = Visible
+	NewFrame.ZIndex = Zindex
+	if UiConner and UiConner == true then
+		local NewUiConner = Instance.new("UICorner", NewFrame)
+		NewUiConner.CornerRadius = UDim.new(0, 7)
+	end	
+	return NewFrame
+end
+
+local function MakeScrolling(Parent, Size, Posi, BGtran, Color, Visible)
+	local NewFrame = Instance.new("ScrollingFrame", Parent)
+	local UIListLayout = Instance.new("UIListLayout", NewFrame)
+	NewFrame.Position = Posi
+	NewFrame.Size = Size
+	NewFrame.BackgroundColor3 = Color
+	NewFrame.BackgroundTransparency = BGtran
+	NewFrame.Visible = Visible
+	NewFrame.ScrollBarThickness = 0
+	UIListLayout.Padding = UDim.new(0,7)
+	return NewFrame
+end
+
+local MainFrame = MakeFrame(ScreenGui, UDim2.new(1, 0,1, 0)
+	, UDim2.new(0, 0,0, 0), 0
+	, Color3.new(1, 1, 1), true, true, 0)
+
+local gradient = Instance.new("UIGradient", MainFrame)
+gradient.Rotation = -45; gradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0, Color3.fromRGB(26, 26, 26)), 	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(34, 34, 34)), ColorSequenceKeypoint.new(1, Color3.fromRGB(72, 72, 72))}
+
+local LogFrame = MakeScrolling(MainFrame, UDim2.new(0, 400,0, 254)
+	, UDim2.new(0.252, 0,0.323, 0), 1
+	, Color3.new(1, 1, 1), true, true)
+LogFrame.Name = "LogFrame"
+
+local Title = MakeText(MainFrame, UDim2.new(0, 351,0, 54), UDim2.new(0.282, 0,0.128, 0), 1, Color3.new(1, 1, 1), true, "wexcea")
+
+local SlideText = MakeText(MainFrame, UDim2.new(0, 351,0, 28), UDim2.new(0.282, 0,0.25, 0), 1, Color3.new(1, 1, 1), true, "")
+
+local Tick_Log_Delete = 0
+task.spawn(function()
+	local fullText = "          99 Night Auto Farm          Buy key with discord wexcea          "
+	local windowSize = 10
+	pcall(function()
+		while true do
+			for i = 1, #fullText - windowSize + 1 do
+				local view = fullText:sub(i, i + windowSize - 1)
+				SlideText.Text = view
+				wait(0.1)
+			end
+		end
+	end)
+end)
+
+task.spawn(function()
+	while wait(0.1) do
+		if LogFrame:FindFirstChild("Delete_in_" .. math.floor(Tick_Log_Delete)) then
+			LogFrame:FindFirstChild("Delete_in_" .. math.floor(Tick_Log_Delete)):Destroy()
+		end
+		Tick_Log_Delete = Tick_Log_Delete + 0.1
+	end
+end)
+
+local Close_Button = MakeTextButton(MainFrame, UDim2.new(0, 200,0, 31)
+	, UDim2.new(0.375, 0,0.872, 0), 1
+	, Color3.new(1, 1, 1), "Close GUI")
+local UIStroke1_Close_Button = Instance.new("UIStroke", Close_Button)
+UIStroke1_Close_Button.Thickness = 3.1
+UIStroke1_Close_Button.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+local UIStroke2_Close_Button = Instance.new("UIStroke", Close_Button)
+UIStroke2_Close_Button.Thickness = 3.1
+UIStroke2_Close_Button.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+Close_Button.Activated:Connect(function()
+	if MainFrame.Visible == false then
+		MainFrame.Visible = true
+	else
+		MainFrame.Visible = false
+	end
+end)
+
+local function Create_Log(Text)
+	local dateTime = os.date("*t")
+	local formattedTime = string.format("%02d/%02d/%04d %02d:%02d:%02d",
+		dateTime.day, dateTime.month, dateTime.year,
+		dateTime.hour, dateTime.min, dateTime.sec)
+	local MainLogFrame = MakeFrame(ScreenGui, UDim2.new(0, 400,0, 31)
+		, UDim2.new(0, 0,0, 0), 0
+		, Color3.new(0.227451, 0.227451, 0.227451), false, true, 0)		
+	local textbabel = MakeText(MainLogFrame, UDim2.new(0, 265,0, 19), UDim2.new(0.31, 0,0.176, 0), 1, Color3.new(1, 1, 1), true, Text)
+	local timelabel = MakeText(MainLogFrame, UDim2.new(0, 88,0, 19), UDim2.new(0.027, 0,0.176, 0), 1, Color3.new(1, 1, 1), true, formattedTime)
+	MainLogFrame.Name = "Delete_in_" .. math.floor(Tick_Log_Delete) + 3
+	MainLogFrame.Parent = LogFrame
+	MainLogFrame.Visible = true
+end
+
+--***** Start Auto Farm *****--
+
+local AutoFarm = false
+local Auto_Add_Wood = false ; local Auto_Add_Feul = false ; local Auto_FOOD = false
+local Kill_Aura_Farm = false ; local AutoFarmGems = false
+
+Auto_Add_Feul = true
+
+local Items = workspace:WaitForChild("Items")
+local Map = workspace:WaitForChild("Map")
+local InnerTouchZone = Map:WaitForChild("Campground"):WaitForChild("MainFire"):WaitForChild("InnerTouchZone")
+local CraftProx = Map:WaitForChild("Campground"):WaitForChild("CraftingBench"):WaitForChild("TouchZone"):WaitForChild("ProximityAttachment"):WaitForChild("ProximityInteraction")---Craft Promp
+local DashedLine = Map:WaitForChild("Campground"):WaitForChild("Scrapper"):WaitForChild("DashedLine")
+
+local RequestStartDraggingItem = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("RequestStartDraggingItem")
+local StopDraggingItem = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("StopDraggingItem")
+
+local Old_Axe = player:WaitForChild("Inventory"):WaitForChild("Old Axe")
+
+local EquipItemHandle = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("EquipItemHandle")
+local Old_Axe_args = {"FireAllClients",player:WaitForChild("Inventory"):WaitForChild("Old Axe")}
+
+local NewOld_Axe = Old_Axe:Clone()
+local OldAxe_WeldConstraint = Instance.new("WeldConstraint", NewOld_Axe.PrimaryPart)
+NewOld_Axe.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(0,-5,0)
+OldAxe_WeldConstraint.Part0 = NewOld_Axe.PrimaryPart
+OldAxe_WeldConstraint.Part1 = HMNRT
+EquipItemHandle:FireServer(unpack(Old_Axe_args))
+NewOld_Axe.Parent = character
+
+local RequestHotbarItem = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("RequestHotbarItem")
+local RequestConsumeItem = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("RequestConsumeItem")
+
+local Stop_Evreything = false
+
+Create_Log("สร้างตัวแปรเสร็จสิ้น")
+
+task.spawn(function()
+	while wait(0.1) do
+		if Stop_Evreything == true then
+			Create_Log("หยุดทุกฟังชั่น")
+			local Main_CFrame = HMNRT.CFrame
+			local Inventory = player:WaitForChild("Inventory")
+			repeat
+				HMNRT.CFrame = Main_CFrame * CFrame.new(math.random(-10,10),120,math.random(-10,10))
+				wait(1)
+				if Inventory:FindFirstChild("Bandage") then
+					local OnlyBandageargs = {Inventory:WaitForChild("Bandage")}
+					local Bandage = Inventory:WaitForChild("Bandage")
+					local Bandage_args = {"FireAllClients",Inventory:FindFirstChild("Bandage")}
+					local NewBandage = Bandage:Clone()
+					local Bandage_args_WeldConstraint = Instance.new("WeldConstraint", NewBandage.PrimaryPart)
+					NewBandage.PrimaryPart.CFrame = HMNRT.CFrame
+					Bandage_args_WeldConstraint.Part0 = NewBandage.PrimaryPart
+					Bandage_args_WeldConstraint.Part1 = HMNRT
+					EquipItemHandle:FireServer(unpack(Bandage_args))
+					NewBandage.Parent = character
+					wait(1)
+					RequestConsumeItem:InvokeServer(OnlyBandageargs)
+				else
+					for _, Model in ipairs(workspace.Items:GetChildren()) do
+						if Stop_Evreything == true and Model.PrimaryPart and  Model.Name == "Bandage"  then
+							wait(0.1)
+							pcall(function()
+								HMNRT.CFrame = Model.PrimaryPart.CFrame * CFrame.new(0,10,0)
+								wait(0.1)
+								RequestStartDraggingItem:FireServer(Model)
+								wait(0.1)
+								RequestHotbarItem:InvokeServer(Model)
+								wait(0.1)
+								StopDraggingItem:FireServer(Model)
+								wait(0.1)
+								RequestStartDraggingItem:FireServer(Model)
+								wait(0.1)
+								StopDraggingItem:FireServer(Model)
+							end)
+						end
+					end
+				end
+			until humanoid.Health > 40
+			Stop_Evreything = false
+		end
+	end
+end)
+
+task.spawn(function()
+	local AcceptPlayAgain = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("AcceptPlayAgain")
+	while wait(0.1) do
+		if humanoid.Health <= 0 then
+			for i=1,100 do
+				AcceptPlayAgain:FireServer()
+				Create_Log("เล่นอีกรอบ")
+				wait(0.5)
+			end
+		end
+		if humanoid.Health < 40 then
+			Stop_Evreything = true
+		end
+	end
+end)
+
+task.spawn(function()
+	local HungerBar = plrGui:WaitForChild("Interface"):WaitForChild("StatBars"):WaitForChild("HungerBar"):FindFirstChild("Bar")
+	while wait(1) do
+		if HungerBar and HungerBar.Size.X.Scale < 0.2 then
+			Auto_FOOD = true
+		end
+		if Auto_FOOD == true and Stop_Evreything == false then
+			for _, Model in ipairs(workspace.Items:GetChildren()) do
+				if Model.Name == "Carrot" or Model.Name == "Berry" then
+					Create_Log("กิน " .. Model.Name)
+					if Auto_FOOD == true and Stop_Evreything == false and Model.PrimaryPart then
+						wait(0.1)
+						HMNRT.CFrame = Model.PrimaryPart.CFrame * CFrame.new(0,10,0)
+						wait(0.1)
+						RequestStartDraggingItem:FireServer(Model)
+						wait(0.1)
+						RequestConsumeItem:InvokeServer(Model)
+						wait(0.1)
+						StopDraggingItem:FireServer(Model)
+						wait(0.1)
+						RequestStartDraggingItem:FireServer(Model)
+						wait(0.1)
+						StopDraggingItem:FireServer(Model)
+						if HungerBar.Size.X.Scale > 0.9 then
+							Auto_FOOD = false
+						end
+					end
+				end
+			end
+		end
+	end
+end)
+local function matchesAllowedKeyword(value, allowedKeywords)
+	value = value:lower()
+	for _, keyword in ipairs(allowedKeywords) do
+		if string.find(value, keyword:lower()) then
+			return true
+		end
+	end
+	return false
+end
+task.spawn(function()
+	local Fire_TextLabel = Map:WaitForChild("Campground"):WaitForChild("MainFire"):WaitForChild("Center"):WaitForChild("BillboardGui"):WaitForChild("Frame"):WaitForChild("TextLabel")
+	while wait(1) do
+		if Auto_Add_Feul == true then
+			for _, Model in ipairs(workspace.Items:GetChildren()) do
+				if Model.Name == "Coal" or Model.Name == "Log" then
+					if matchesAllowedKeyword(Fire_TextLabel.Text, {"Level 5"}) then
+						Create_Log("กองไฟถึงเลเวล 5 ")
+						Auto_Add_Feul = false
+						AutoFarmGems = true -- true
+						Kill_Aura_Farm = true -- true
+					else
+						if Auto_Add_Feul == true and Model.PrimaryPart then
+							Create_Log("เติมไฟ")
+							wait(0.2)
+							local mainPart = Model.PrimaryPart
+							HMNRT.CFrame = mainPart.CFrame * CFrame.new(0,10,0)
+							wait(0.2)					
+							RequestStartDraggingItem:FireServer(Model)
+							wait(0.2)
+							HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,10,0)
+							wait(0.2)
+							StopDraggingItem:FireServer(Model)
+							wait(0.2)
+							mainPart.CFrame = InnerTouchZone.CFrame * CFrame.new(0,10,0)
+							wait(0.1)
+							RequestStartDraggingItem:FireServer(Model)
+							wait(0.2)
+							StopDraggingItem:FireServer(Model)
+						end
+					end
+				end
+			end
+		end
+	end
+end)
+
+local StrongHold_Locate = nil
+local OnTopEnameis = false
+local SpinFind_StrongHold = false
+
+task.spawn(function()
+	local ToolDamageObject = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("ToolDamageObject")
+	while wait(0.1) do
+		if Kill_Aura_Farm == true and StrongHold_Locate then
+			local nearest = nil
+			local nearestDistance = math.huge
+			for _, obj in pairs(workspace.Characters:GetDescendants()) do
+				if obj.Name == "Cultist" or obj.Name == "Crossbow Cultist" 
+					or obj.Name == "Wolf" or obj.Name == "Bear" or obj.Name == "Alpha Wolf" then
+					if obj:IsA("Model") and obj:FindFirstChild("NPC") and obj:FindFirstChild("HumanoidRootPart") then
+						local dist = (obj.HumanoidRootPart.Position - StrongHold_Locate.PrimaryPart.Position).Magnitude
+						if dist < nearestDistance then
+							nearestDistance = dist
+							nearest = obj
+						end
+					end					
+				end
+			end
+			if nearest and nearestDistance < 120 and Auto_FOOD == false and Stop_Evreything == false then
+				local Humanoid = nearest:FindFirstChild("NPC")
+				local RootPart = nearest:FindFirstChild("HumanoidRootPart")
+				if OnTopEnameis == true then
+					HMNRT.CFrame = RootPart.CFrame * CFrame.new(0,120,0)
+				end				
+				local Kill_args = {nearest,player:WaitForChild("Inventory"):WaitForChild("Old Axe"),"3_8880410317",
+					CFrame.new(RootPart.Position.X, RootPart.Position.Y, RootPart.Position.Z, 0.6668938994407654, 0.32279011607170105, -0.6716093420982361, -2.5697719507888905e-08, 0.901304304599762, 0.43318650126457214, 0.7451527118682861, -0.28888940811157227, 0.6010743379592896)
+				}
+				ToolDamageObject:InvokeServer(unpack(Kill_args))
+			end
+		end
+	end
+end)
+
+local orbitTime = 0
+local orbitRadius = 10
+local orbitSpeed = 100
+
+RunService.RenderStepped:Connect(function(dt)
+	if Stop_Evreything == false then
+		if not SpinFind_StrongHold or not InnerTouchZone then return end
+		orbitTime = orbitTime + dt
+		local angle = math.rad(orbitSpeed) * orbitTime
+		local offset = Vector3.new(math.cos(angle) * orbitRadius, 100, math.sin(angle) * orbitRadius)
+		local newPos = InnerTouchZone.Position + offset
+		if HMNRT then
+			HMNRT.CFrame = CFrame.new(newPos)
+			orbitRadius = orbitRadius + 2
+			orbitSpeed = orbitSpeed + 0.0001
+		end
+	end
+end)
+
+task.spawn(function()
+	while wait(0.1) do
+		if AutoFarmGems == true then
+			if Map:FindFirstChild("Landmarks"):FindFirstChild("Stronghold") then
+				local Stronghold = Map:FindFirstChild("Landmarks"):FindFirstChild("Stronghold")
+				if Stronghold and Stronghold:FindFirstChild("Functional"):FindFirstChild("EntryDoors"):FindFirstChild("DoorRight"):FindFirstChild("Main"):FindFirstChild("ProximityAttachment"):FindFirstChild("ProximityInteraction") then
+					StrongHold_Locate = Stronghold
+					local Functional = Stronghold:FindFirstChild("Functional")
+					local TriggerZone1 = Functional:FindFirstChild("EnemyWaves12"):FindFirstChild("Wave1"):FindFirstChild("TriggerZone")
+					local TriggerZone2 = Functional:FindFirstChild("EnemyWaves345"):FindFirstChild("Wave1"):FindFirstChild("TriggerZone")
+					if Functional then
+						workspace.Gravity = 1
+						OnTopEnameis = false
+						if workspace:FindFirstChild("Items"):FindFirstChild("Stronghold Diamond Chest") then
+							local Main = workspace:FindFirstChild("Items"):FindFirstChild("Stronghold Diamond Chest"):FindFirstChild("Main")
+							if Auto_FOOD == true then
+								repeat
+									wait(0.1)
+								until Auto_FOOD == false
+							end
+							if Stop_Evreything == true then
+								repeat
+									wait(0.1)
+								until Stop_Evreything == false
+							end
+							if Main and Main:FindFirstChild("ProximityAttachment") then
+								local ProximityAttachment = Main:FindFirstChild("ProximityAttachment")
+								if ProximityAttachment and ProximityAttachment:FindFirstChild("ProximityInteraction") then
+									local Stronghold_Diamond_Chest = ProximityAttachment:FindFirstChild("ProximityInteraction")
+									if Stronghold_Diamond_Chest then
+										HMNRT.CFrame = Stronghold_Diamond_Chest.Parent.WorldCFrame							
+										wait(0.05)
+										fireproximityprompt(Stronghold_Diamond_Chest)
+									end
+								end
+							end
+							for _, Model in ipairs(workspace.Items:GetChildren()) do
+								if Model.Name == "Diamond" then
+									Create_Log("เก็บเพชร")
+									if Model.PrimaryPart and Auto_FOOD == false then
+										wait(0.1)
+										HMNRT.CFrame = Model.PrimaryPart.CFrame
+										wait(0.1)
+										RequestStartDraggingItem:FireServer(Model)
+										wait(0.1)
+										RequestHotbarItem:InvokeServer(Model)
+										wait(0.1)
+										StopDraggingItem:FireServer(Model)
+									end
+									wait()
+								end
+							end
+						end
+						if TriggerZone1 and TriggerZone2 then
+							wait(0.05)
+							HMNRT.CFrame = TriggerZone1.CFrame
+							wait(0.05)
+							HMNRT.CFrame = TriggerZone2.CFrame
+						end
+						wait(0.05)
+						OnTopEnameis = true
+						wait(10)
+						workspace.Gravity = 196.2
+					end
+				end
+			else
+				if StrongHold_Locate == nil then
+					Create_Log("หาสตรองโฮล")
+					SpinFind_StrongHold = true
+					wait(5)
+					SpinFind_StrongHold = false
+				end
+			end
+		end
+	end
+end)
