@@ -56,6 +56,20 @@ local function MakeFrame(Parent, Size, Posi, BGtran, Color, Visible, UiConner, Z
 	return NewFrame
 end
 
+local function MakeImageButton(Parent, Size, Posi, BGtran, Color, Imtran, imageID)
+	local NewFrame = Instance.new("ImageButton", Parent)
+	local UICorner = Instance.new("UICorner", NewFrame)
+	NewFrame.Position = Posi
+	NewFrame.Size = Size
+	NewFrame.BackgroundTransparency = BGtran
+	NewFrame.Image = imageID or ""
+	NewFrame.ImageTransparency = Imtran
+	NewFrame.BackgroundColor3 = Color
+	NewFrame.ImageColor3 = Color
+	NewFrame.ZIndex = 2
+	return NewFrame
+end
+
 local function MakeScrolling(Parent, Size, Posi, BGtran, Color, Visible)
 	local NewFrame = Instance.new("ScrollingFrame", Parent)
 	local UIListLayout = Instance.new("UIListLayout", NewFrame)
@@ -69,10 +83,15 @@ local function MakeScrolling(Parent, Size, Posi, BGtran, Color, Visible)
 	return NewFrame
 end
 
+
 local MainFrame = MakeFrame(ScreenGui, UDim2.new(1, 0,1, 0)
 	, UDim2.new(0, 0,0, 0), 0
 	, Color3.new(1, 1, 1), true, true, 0)
 
+local DiamonImage = MakeImageButton(MainFrame, UDim2.new(0, 33,0, 33), UDim2.new(0.646, 0,0.872, 0), 1, Color3.new(1, 1, 1), 0, "rbxassetid://112132277624764")
+
+local DiamonCount = MakeText(DiamonImage, UDim2.new(0, 145,0, 23), UDim2.new(1.233, 0,0.1, 0), 1, Color3.new(1, 1, 1), true, "")
+DiamonCount.TextXAlignment = Enum.TextXAlignment.Left
 local gradient = Instance.new("UIGradient", MainFrame)
 gradient.Rotation = -45; gradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0, Color3.fromRGB(26, 26, 26)), 	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(34, 34, 34)), ColorSequenceKeypoint.new(1, Color3.fromRGB(72, 72, 72))}
 
@@ -80,14 +99,13 @@ local LogFrame = MakeScrolling(MainFrame, UDim2.new(0, 400,0, 254)
 	, UDim2.new(0.252, 0,0.323, 0), 1
 	, Color3.new(1, 1, 1), true, true)
 LogFrame.Name = "LogFrame"
-local Title = MakeText(MainFrame, UDim2.new(0, 351,0, 54), UDim2.new(0.282, 0,0.128, 0), 1, Color3.new(1, 1, 1), true, "wexcea")
+local Title = MakeText(MainFrame, UDim2.new(0, 351,0, 54), UDim2.new(0.282, 0,0.11, 0), 1, Color3.new(1, 1, 1), true, "wexcea")
 local SlideText = MakeText(MainFrame, UDim2.new(0, 351,0, 28), UDim2.new(0.282, 0,0.25, 0), 1, Color3.new(1, 1, 1), true, "")
 
 local Tick_Log_Delete = 0
-
+local fullText = "                    99 Night Auto Farm                    Buy key with discord wexcea                    "
 task.spawn(function()
-	local fullText = "          99 Night Auto Farm          Buy key with discord wexcea          "
-	local windowSize = 10
+	local windowSize = 20
 	pcall(function()
 		while true do
 			for i = 1, #fullText - windowSize + 1 do
@@ -98,21 +116,34 @@ task.spawn(function()
 		end
 	end)
 end)
-
-task.spawn(function()
+task.spawn(function()--game:GetService("Players").LocalPlayer.PlayerGui.Interface.DiamondCount.Count.Text
+	local Count = plrGui:WaitForChild("Interface"):WaitForChild("DiamondCount"):FindFirstChild("Count")
 	while wait(0.1) do
 		pcall(function()
 			if LogFrame:FindFirstChild("Delete_in_" .. math.floor(Tick_Log_Delete)) then
 				LogFrame:FindFirstChild("Delete_in_" .. math.floor(Tick_Log_Delete)):Destroy()
 			end
+			if #LogFrame:GetChildren() > 10 then
+				for _, Frame in ipairs(LogFrame:GetChildren()) do
+					if Frame:IsA("Frame") then
+						Frame:Destroy()
+					end
+					wait()
+				end
+			end
 		end)
 		Tick_Log_Delete = Tick_Log_Delete + 0.1
+		if Count then
+			DiamonCount.Text = Count.Text
+		end
 	end
 end)
 
-local Close_Button = MakeTextButton(MainFrame, UDim2.new(0, 200,0, 31)
-	, UDim2.new(0.375, 0,0.872, 0), 1
+local Close_Button = MakeTextButton(ScreenGui, UDim2.new(0, 200,0, 31)
+	, UDim2.new(0.375, 0,0.872, 0), 0
 	, Color3.new(1, 1, 1), "Close GUI")
+Close_Button.BackgroundColor3 = Color3.new(0.137255, 0.137255, 0.137255)
+local UICorner_Close_Button = Instance.new("UICorner", Close_Button)
 local UIStroke1_Close_Button = Instance.new("UIStroke", Close_Button)
 UIStroke1_Close_Button.Thickness = 3.1
 UIStroke1_Close_Button.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
@@ -122,8 +153,10 @@ UIStroke2_Close_Button.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 Close_Button.Activated:Connect(function()
 	if MainFrame.Visible == false then
 		MainFrame.Visible = true
+		Close_Button.Text = "Close GUI"
 	else
 		MainFrame.Visible = false
+		Close_Button.Text = "Open GUI"
 	end
 end)
 
@@ -168,7 +201,7 @@ local Old_Axe_args = {"FireAllClients",player:WaitForChild("Inventory"):WaitForC
 
 local NewOld_Axe = Old_Axe:Clone()
 local OldAxe_WeldConstraint = Instance.new("WeldConstraint", NewOld_Axe.PrimaryPart)
-NewOld_Axe.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(0,-5,0)
+NewOld_Axe.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(0,-1,0)
 OldAxe_WeldConstraint.Part0 = NewOld_Axe.PrimaryPart
 OldAxe_WeldConstraint.Part1 = HMNRT
 EquipItemHandle:FireServer(unpack(Old_Axe_args))
@@ -182,6 +215,7 @@ local Stop_Evreything = false
 Create_Log("สร้างตัวแปรเสร็จสิ้น")
 
 task.spawn(function()
+	local Bandage_Count = 0
 	while wait(0.1) do
 		if Stop_Evreything == true then
 			Create_Log("หยุดทุกฟังชั่น")
@@ -210,17 +244,20 @@ task.spawn(function()
 						if Stop_Evreything == true and Model.PrimaryPart and  Model.Name == "Bandage"  then
 							wait(0.1)
 							pcall(function()
-								HMNRT.CFrame = Model.PrimaryPart.CFrame * CFrame.new(0,10,0)
-								wait(0.1)
-								RequestStartDraggingItem:FireServer(Model)
-								wait(0.1)
-								RequestHotbarItem:InvokeServer(Model)
-								wait(0.1)
-								StopDraggingItem:FireServer(Model)
-								wait(0.1)
-								RequestStartDraggingItem:FireServer(Model)
-								wait(0.1)
-								StopDraggingItem:FireServer(Model)
+								if Bandage_Count < 5 then
+									Bandage_Count = Bandage_Count + 1
+									HMNRT.CFrame = Model.PrimaryPart.CFrame * CFrame.new(0,10,0)
+									wait(0.1)
+									RequestStartDraggingItem:FireServer(Model)
+									wait(0.1)
+									RequestHotbarItem:InvokeServer(Model)
+									wait(0.1)
+									StopDraggingItem:FireServer(Model)
+									wait(0.1)
+									RequestStartDraggingItem:FireServer(Model)
+									wait(0.1)
+									StopDraggingItem:FireServer(Model)
+								end
 							end)
 						end
 					end
