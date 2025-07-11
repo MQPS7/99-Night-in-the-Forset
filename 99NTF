@@ -138,7 +138,7 @@ local function Create_Log(Text)
 			, Color3.new(0.227451, 0.227451, 0.227451), false, true, 0)		
 		local textbabel = MakeText(MainLogFrame, UDim2.new(0, 265,0, 19), UDim2.new(0.31, 0,0.176, 0), 1, Color3.new(1, 1, 1), true, Text)
 		local timelabel = MakeText(MainLogFrame, UDim2.new(0, 88,0, 19), UDim2.new(0.027, 0,0.176, 0), 1, Color3.new(1, 1, 1), true, formattedTime)
-		MainLogFrame.Name = "Delete_in_" .. math.floor(Tick_Log_Delete) + 4
+		MainLogFrame.Name = "Delete_in_" .. math.floor(Tick_Log_Delete) + 6
 		MainLogFrame.Parent = LogFrame
 		MainLogFrame.Visible = true
 	end)
