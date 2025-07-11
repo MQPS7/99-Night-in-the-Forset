@@ -1,4 +1,3 @@
-
 local TweenService = game:GetService("TweenService")
 local Lighting = game:GetService("Lighting")
 local replicatedStorage = game:GetService("ReplicatedStorage")
@@ -81,12 +80,11 @@ local LogFrame = MakeScrolling(MainFrame, UDim2.new(0, 400,0, 254)
 	, UDim2.new(0.252, 0,0.323, 0), 1
 	, Color3.new(1, 1, 1), true, true)
 LogFrame.Name = "LogFrame"
-
 local Title = MakeText(MainFrame, UDim2.new(0, 351,0, 54), UDim2.new(0.282, 0,0.128, 0), 1, Color3.new(1, 1, 1), true, "wexcea")
-
 local SlideText = MakeText(MainFrame, UDim2.new(0, 351,0, 28), UDim2.new(0.282, 0,0.25, 0), 1, Color3.new(1, 1, 1), true, "")
 
 local Tick_Log_Delete = 0
+
 task.spawn(function()
 	local fullText = "          99 Night Auto Farm          Buy key with discord wexcea          "
 	local windowSize = 10
@@ -103,9 +101,11 @@ end)
 
 task.spawn(function()
 	while wait(0.1) do
-		if LogFrame:FindFirstChild("Delete_in_" .. math.floor(Tick_Log_Delete)) then
-			LogFrame:FindFirstChild("Delete_in_" .. math.floor(Tick_Log_Delete)):Destroy()
-		end
+		pcall(function()
+			if LogFrame:FindFirstChild("Delete_in_" .. math.floor(Tick_Log_Delete)) then
+				LogFrame:FindFirstChild("Delete_in_" .. math.floor(Tick_Log_Delete)):Destroy()
+			end
+		end)
 		Tick_Log_Delete = Tick_Log_Delete + 0.1
 	end
 end)
@@ -137,7 +137,7 @@ local function Create_Log(Text)
 		, Color3.new(0.227451, 0.227451, 0.227451), false, true, 0)		
 	local textbabel = MakeText(MainLogFrame, UDim2.new(0, 265,0, 19), UDim2.new(0.31, 0,0.176, 0), 1, Color3.new(1, 1, 1), true, Text)
 	local timelabel = MakeText(MainLogFrame, UDim2.new(0, 88,0, 19), UDim2.new(0.027, 0,0.176, 0), 1, Color3.new(1, 1, 1), true, formattedTime)
-	MainLogFrame.Name = "Delete_in_" .. math.floor(Tick_Log_Delete) + 3
+	MainLogFrame.Name = "Delete_in_" .. math.floor(Tick_Log_Delete) + 4
 	MainLogFrame.Parent = LogFrame
 	MainLogFrame.Visible = true
 end
