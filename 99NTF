@@ -201,7 +201,7 @@ local Old_Axe_args = {"FireAllClients",player:WaitForChild("Inventory"):WaitForC
 
 local NewOld_Axe = Old_Axe:Clone()
 local OldAxe_WeldConstraint = Instance.new("WeldConstraint", NewOld_Axe.PrimaryPart)
-NewOld_Axe.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(0,-1,0)
+NewOld_Axe.PrimaryPart.CFrame = HMNRT.CFrame
 OldAxe_WeldConstraint.Part0 = NewOld_Axe.PrimaryPart
 OldAxe_WeldConstraint.Part1 = HMNRT
 EquipItemHandle:FireServer(unpack(Old_Axe_args))
