@@ -300,7 +300,9 @@ task.spawn(function()
 			for _, Model in ipairs(workspace.Items:GetChildren()) do
 				if Model.Name == "Coal" or Model.Name == "Log" then
 					if matchesAllowedKeyword(Fire_TextLabel.Text, {"Level 5"}) then
-						Create_Log("กองไฟถึงเลเวล 5 ")
+						if AutoFarmGems == false then
+							Create_Log("กองไฟถึงเลเวล 5 ")
+						end						
 						Auto_Add_Feul = false
 						AutoFarmGems = true -- true
 						Kill_Aura_Farm = true -- true
