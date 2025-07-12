@@ -434,6 +434,7 @@ RunService.RenderStepped:Connect(function(dt)
 end)
 
 task.spawn(function()
+	local RequestTakeDiamonds = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("RequestTakeDiamonds")
 	while wait(0.1) do
 		if AutoFarmGems == true then
 			if Map:FindFirstChild("Landmarks"):FindFirstChild("Stronghold") then
@@ -478,16 +479,12 @@ task.spawn(function()
 										if Model.PrimaryPart and Auto_FOOD == false then
 											wait(0.1)
 											HMNRT.CFrame = Model.PrimaryPart.CFrame
-											wait(5)
-											for i=1,3 do
-												if Model then
-													RequestStartDraggingItem:FireServer(Model)
-													wait(0.2)
-													RequestHotbarItem:InvokeServer(Model)
-													wait(0.1)
-													StopDraggingItem:FireServer(Model)
-												end
-											end
+											wait(0.1)
+											RequestStartDraggingItem:FireServer(Model)
+											wait(0.1)
+											RequestTakeDiamonds:InvokeServer(Model)
+											wait(0.1)
+											StopDraggingItem:FireServer(Model)
 										end
 										wait()
 									end)
