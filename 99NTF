@@ -215,73 +215,16 @@ local Stop_Evreything = false
 Create_Log("สร้างตัวแปรเสร็จสิ้น")
 
 task.spawn(function()
-	local Bandage_Count = 0
-	while wait(0.1) do
-		if Stop_Evreything == true then
-			Create_Log("หยุดทุกฟังชั่น")
-			local Main_CFrame = HMNRT.CFrame
-			local Inventory = player:WaitForChild("Inventory")
-			repeat
-				HMNRT.CFrame = Main_CFrame * CFrame.new(math.random(-10,10),120,math.random(-10,10))
-				wait(1)
-				if Inventory:FindFirstChild("Bandage") then
-					pcall(function()
-						local OnlyBandageargs = {Inventory:WaitForChild("Bandage")}
-						local Bandage = Inventory:WaitForChild("Bandage")
-						local Bandage_args = {"FireAllClients",Inventory:FindFirstChild("Bandage")}
-						local NewBandage = Bandage:Clone()
-						local Bandage_args_WeldConstraint = Instance.new("WeldConstraint", NewBandage.PrimaryPart)
-						NewBandage.PrimaryPart.CFrame = HMNRT.CFrame
-						Bandage_args_WeldConstraint.Part0 = NewBandage.PrimaryPart
-						Bandage_args_WeldConstraint.Part1 = HMNRT
-						EquipItemHandle:FireServer(unpack(Bandage_args))
-						NewBandage.Parent = character
-						wait(0.1)
-						RequestConsumeItem:InvokeServer(OnlyBandageargs)
-					end)
-				else
-					for _, Model in ipairs(workspace.Items:GetChildren()) do
-						if Stop_Evreything == true and Model.PrimaryPart and  Model.Name == "Bandage"  then
-							wait(0.1)
-							pcall(function()
-								if Bandage_Count < 5 then
-									Bandage_Count = Bandage_Count + 1
-									HMNRT.CFrame = Model.PrimaryPart.CFrame * CFrame.new(0,10,0)
-									wait(0.1)
-									RequestStartDraggingItem:FireServer(Model)
-									wait(0.1)
-									RequestHotbarItem:InvokeServer(Model)
-									wait(0.1)
-									StopDraggingItem:FireServer(Model)
-									wait(0.1)
-									RequestStartDraggingItem:FireServer(Model)
-									wait(0.1)
-									StopDraggingItem:FireServer(Model)
-								end
-							end)
-						end
-					end
-				end
-			until humanoid.Health > 40
-			Stop_Evreything = false
-		end
-	end
-end)
-
-task.spawn(function()
 	local AcceptPlayAgain = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("AcceptPlayAgain")
 	
 	while wait(0.05) do
 		pcall(function()
 			if humanoid.Health <= 0 then
+				Create_Log("เล่นอีกรอบ")
 				for i=1,100 do
 					AcceptPlayAgain:FireServer()
-					Create_Log("เล่นอีกรอบ")
 					wait(0.1)
 				end
-			end
-			if humanoid.Health < 40 then
-				Stop_Evreything = true
 			end
 		end)
 	end
