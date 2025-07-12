@@ -482,7 +482,7 @@ task.spawn(function()
 											wait(0.1)
 											RequestStartDraggingItem:FireServer(Model)
 											wait(0.1)
-											RequestTakeDiamonds:InvokeServer(Model)
+											RequestTakeDiamonds:FireServer(Model)
 											wait(0.1)
 											StopDraggingItem:FireServer(Model)
 										end
