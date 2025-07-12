@@ -201,7 +201,7 @@ local Old_Axe_args = {"FireAllClients",player:WaitForChild("Inventory"):WaitForC
 
 local NewOld_Axe = Old_Axe:Clone()
 local OldAxe_WeldConstraint = Instance.new("WeldConstraint", NewOld_Axe.PrimaryPart)
-NewOld_Axe.PrimaryPart.CFrame = HMNRT.CFrame
+NewOld_Axe.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(0,-1,0)
 OldAxe_WeldConstraint.Part0 = NewOld_Axe.PrimaryPart
 OldAxe_WeldConstraint.Part1 = HMNRT
 EquipItemHandle:FireServer(unpack(Old_Axe_args))
@@ -236,7 +236,7 @@ task.spawn(function()
 						Bandage_args_WeldConstraint.Part1 = HMNRT
 						EquipItemHandle:FireServer(unpack(Bandage_args))
 						NewBandage.Parent = character
-						wait(1)
+						wait(0.1)
 						RequestConsumeItem:InvokeServer(OnlyBandageargs)
 					end)
 				else
@@ -478,12 +478,16 @@ task.spawn(function()
 										if Model.PrimaryPart and Auto_FOOD == false then
 											wait(0.1)
 											HMNRT.CFrame = Model.PrimaryPart.CFrame
-											wait(0.1)
-											RequestStartDraggingItem:FireServer(Model)
-											wait(0.1)
-											RequestHotbarItem:InvokeServer(Model)
-											wait(0.1)
-											StopDraggingItem:FireServer(Model)
+											wait(5)
+											for i=1,3 do
+												if Model then
+													RequestStartDraggingItem:FireServer(Model)
+													wait(0.2)
+													RequestHotbarItem:InvokeServer(Model)
+													wait(0.1)
+													StopDraggingItem:FireServer(Model)
+												end
+											end
 										end
 										wait()
 									end)
