@@ -57,16 +57,16 @@ end
 local function UnEquip()
 	if Inventory:FindFirstChild("Old Axe") then
 		local Old_Axe = Inventory:FindFirstChild("Old Axe")
-		UnequipItemHandle:FireServer("FireAllClients",Old_Axe)
+		--UnequipItemHandle:FireServer("FireAllClients",Old_Axe)
 	elseif Inventory:FindFirstChild("Good Axe") then
 		local Good_Axe = Inventory:FindFirstChild("Good Axe")
-		UnequipItemHandle:FireServer("FireAllClients",Good_Axe)
+		--UnequipItemHandle:FireServer("FireAllClients",Good_Axe)
 	elseif Inventory:FindFirstChild("Strong Axe") then
 		local Strong_Axe = Inventory:FindFirstChild("Strong Axe")
-		UnequipItemHandle:FireServer("FireAllClients",Strong_Axe)
+		--UnequipItemHandle:FireServer("FireAllClients",Strong_Axe)
 	end
 	if character:FindFirstChild("ToolHandle") then
-		character:FindFirstChild("ToolHandle"):Destroy()
+		--character:FindFirstChild("ToolHandle"):Destroy()
 	end
 end
 
