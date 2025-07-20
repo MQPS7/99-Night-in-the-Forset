@@ -845,6 +845,28 @@ function Fly()
 	Human.AutoRotate = true
 end
 
+local ModePlayer2 = Create_Line(ModePlayer_SelectFuntion, "แสงและเงา 💡")
+
+local Nofog_Button = Create_Toggle(ModePlayer_SelectFuntion, "ปิดหมอก")
+local Nofog = false;Nofog_Button.Activated:Connect(function()
+	if Nofog == false then
+		Nofog = true
+	else
+		Nofog = false
+		Lighting.FogEnd = 300
+		Lighting.FogStart = 50
+	end	
+end)
+
+task.spawn(function()
+	while wait(0.5) do
+		if Nofog == true then
+			Lighting.FogEnd = 5000
+			Lighting.FogStart = 5000
+		end
+	end
+end)
+
 ---------------- **** ModeFarm_SelectFuntion **** ----------------
 
 local AutoCutTree_Button = Create_Toggle(ModeFarm_SelectFuntion, "ออโต้ตัดไม้")
@@ -875,7 +897,7 @@ end)
 
 local ModeDragLine_1 = Create_Line(ModeFarm_SelectFuntion, "ต่อสู้ 🗡️")
 
-local KillAura_Button = Create_Toggle(ModeFarm_SelectFuntion, "ออโต้ตัดไม้")
+local KillAura_Button = Create_Toggle(ModeFarm_SelectFuntion, "คิลออร่า")
 local KillAura = false;KillAura_Button.Activated:Connect(function()
 	if KillAura == false then
 		KillAura = true
@@ -915,7 +937,7 @@ task.spawn(function()
 			end
 			local nearest = nil
 			local nearestDistance = math.huge
-			for _, obj in pairs(workspace.Characters:GetDescendants()) do
+			for _, obj in pairs(workspace.Characters:GetChildren()) do
 				if obj:IsA("Model") and obj:FindFirstChild("NPC") and obj:FindFirstChild("HumanoidRootPart") then
 					local dist = (obj.HumanoidRootPart.Position - HMNRT.Position).Magnitude
 					if dist < nearestDistance and KillAura == true then
