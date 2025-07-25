@@ -369,7 +369,7 @@ end)
 
 local IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 local TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-local VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.1")
+local VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.3")
 local FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -870,6 +870,24 @@ task.spawn(function()
 	end
 end)
 
+local Brightness_Button = Create_Toggle(ModePlayer_SelectFuntion, "เพิ่มแสง")
+local Brightness = false;Brightness_Button.Activated:Connect(function()
+	if Brightness == false then
+		Brightness = true
+	else
+		Brightness = false
+		Lighting.Brightness = 1
+	end	
+end)
+
+task.spawn(function()
+	while wait(0.5) do
+		if Brightness == true then
+			Lighting.Brightness = 10
+		end
+	end
+end)
+
 ---------------- **** ModeFarm_SelectFuntion **** ----------------
 
 local AutoCutTree_Button = Create_Toggle(ModeFarm_SelectFuntion, "ออโต้ตัดไม้")
@@ -931,7 +949,7 @@ end)
 
 task.spawn(function()
 	local ToolDamageObject = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("ToolDamageObject")
-	while wait(0.6) do
+	while wait(0.4) do
 		if KillAura == true then
 			if character:FindFirstChild("ToolHandle") then
 				UnEquip()
@@ -952,12 +970,13 @@ task.spawn(function()
 			if nearest then
 				local Humanoid = nearest:FindFirstChild("NPC")
 				local RootPart = nearest:FindFirstChild("HumanoidRootPart")
-				if OnTopEnameis == true then
+				if OnTopEnameis == true and RootPart then
 					HMNRT.CFrame = RootPart.CFrame * CFrame.new(0,67,0)
 				end
-				local Kill_args = {nearest,PlayerAxe,"9_989989898",
-					CFrame.new(RootPart.Position.X, RootPart.Position.Y, RootPart.Position.Z, 0, 0, 0, 2, 0, 0, 0, -0.2, 0.6)}
-				ToolDamageObject:InvokeServer(unpack(Kill_args))
+				if RootPart and ToolDamageObject and PlayerAxe then
+					local Kill_args = {nearest,PlayerAxe,"9_989989898",CFrame.new(RootPart.Position.X, RootPart.Position.Y, RootPart.Position.Z, 0, 0, 0, 2, 0, 0, 0, -0.2, 0.6)}
+					ToolDamageObject:InvokeServer(unpack(Kill_args))
+				end
 			end
 		end
 	end
@@ -990,7 +1009,177 @@ TarFire_Button.Activated:Connect(function()
 	Target = "Fire"--InnerTouchZone
 end)
 
-local ModeDragLine_2 = Create_Line(ModeDrag_SelectFuntion, "ไอเท็มทั้งหมด 📦")
+local function BringItemWithItem2(item2)
+	pcall(function()
+		if Target == "Character" then
+			item2.PrimaryPart.CFrame = HMNRT.CFrame
+			wait(0.1)
+			RequestStartDraggingItem:FireServer(item2)
+			wait(0.1)
+			StopDraggingItem:FireServer(item2)
+		elseif Target == "Craft" then
+			item2.PrimaryPart.CFrame = DashedLine.CFrame * CFrame.new(0,7,0)
+			wait(0.1)
+			RequestStartDraggingItem:FireServer(item2)
+			wait(0.1)
+			StopDraggingItem:FireServer(item2)
+		elseif Target == "NearCamp" then
+			item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(-15,0,0)
+			wait(0.1)
+			RequestStartDraggingItem:FireServer(item2)
+			wait(0.1)
+			StopDraggingItem:FireServer(item2)
+		elseif Target == "Fire" then
+			item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(0,15,0)
+			wait(0.1)
+			RequestStartDraggingItem:FireServer(item2)
+			wait(0.1)
+			StopDraggingItem:FireServer(item2)
+		end
+	end)
+end
+
+local ModeDragLine_2 = Create_Line(ModeDrag_SelectFuntion, "เชื้อเพลิง 🔥")
+
+local All_Item_In_Game_Teble = {"Alien", "Alien", "Alpha Wolf Corpse"
+	, "Apple", "Bandage" ,"Bolt", "Broken Fan", "Berry", "Broken Microwave"
+	, "Cake", "Carrot", "Chair", "Coal", "Coin Stack", "Fuel Canister", "Hologram Emitter"
+	, "Iron Body", "Leather Body", "Log", "Meat? Sandwich", "MedKit"
+	, "Metal Chair", "Oil Barrel", "Old Car Engine", "Old Flashlight"	
+	, "Old Radio", "Revolver", "Revolver Ammo", "Rifle", "Rifle Ammo", "Seed Box", "Sheet Metal"
+	, "Strong Axe", "Tyre", "Cultist Gem", "Cultist Prototype"
+	, "Laser Sword", "Raygun", "UFO Junk", "UFO Scrap", "Washing Machine", "Wolf Corpse"
+}
+
+local Item_Fuel_Teble = {"Chair", "Coal", "Fuel Canister", "Log", "Oil Barrel"}
+
+local Item_Weapon_Teble = {"Bandage", "Iron Body", "Leather Body", "MedKit"
+	, "Revolver", "Revolver Ammo", "Rifle", "Rifle Ammo", "Strong Axe", "Laser Sword", "Raygun"}
+
+local Item_Food_Teble = {"Apple", "Berry", "Cake", "Carrot", "Meat? Sandwich"}
+
+local Item_Scrap_Teble = {"Broken Microwave", "Metal Chair", "Old Car Engine", "Old Radio", "Sheet Metal", "Tyre", "UFO Junk", "UFO Scrap", "Washing Machine"}
+
+local Drop_Fuel_Item, Drop_Fuel_Item_List, ResetButton_Bring_Fuel_Item = Create_SelectPick(ModeDrag_SelectFuntion, "เลือกไอเท็ม", 6)
+ResetButton_Bring_Fuel_Item.Visible = false
+for _, Item_In_Game in ipairs(Item_Fuel_Teble) do
+	local NewButton = Create_Toggle_InSC(Drop_Fuel_Item, Item_In_Game)
+	NewButton.Activated:Connect(function()
+		if Drop_Fuel_Item_List:FindFirstChild(Item_In_Game) then
+			Drop_Fuel_Item_List:FindFirstChild(Item_In_Game):Destroy()
+		else
+			local NewTag = Instance.new("RayValue", Drop_Fuel_Item_List) ; NewTag.Name = Item_In_Game
+		end
+	end)
+	wait()
+end
+local Bring_Fuel_Button = Create_Click(ModeDrag_SelectFuntion, "ดึงเชื้อเพลิงที่เลือก")
+Bring_Fuel_Button.Activated:Connect(function()	
+	for _, item2 in ipairs(Drop_Fuel_Item_List:GetChildren()) do
+		if item2:IsA("RayValue") then
+			local TargetName = item2.Name
+			for _, item2 in ipairs(Items:GetChildren()) do
+				if item2.Name == TargetName and item2.PrimaryPart then
+					BringItemWithItem2(item2)
+				end
+				wait()
+			end
+		end
+		wait()
+	end
+end)
+local ModeDragLine_2 = Create_Line(ModeDrag_SelectFuntion, "อาวุธ 💣")
+
+local Drop_Weapon_Item, Drop_Weapon_Item_List, ResetButton_Bring_Weapon_Item = Create_SelectPick(ModeDrag_SelectFuntion, "เลือกไอเท็ม", 10)
+ResetButton_Bring_Weapon_Item.Visible = false
+for _, Item_In_Game in ipairs(Item_Weapon_Teble) do
+	local NewButton = Create_Toggle_InSC(Drop_Weapon_Item, Item_In_Game)
+	NewButton.Activated:Connect(function()
+		if Drop_Weapon_Item_List:FindFirstChild(Item_In_Game) then
+			Drop_Weapon_Item_List:FindFirstChild(Item_In_Game):Destroy()
+		else
+			local NewTag = Instance.new("RayValue", Drop_Weapon_Item_List) ; NewTag.Name = Item_In_Game
+		end
+	end)
+	wait()
+end
+local Bring_Weapon_Button = Create_Click(ModeDrag_SelectFuntion, "ดึงอาวุธ")
+Bring_Weapon_Button.Activated:Connect(function()	
+	for _, item2 in ipairs(Drop_Weapon_Item_List:GetChildren()) do
+		if item2:IsA("RayValue") then
+			local TargetName = item2.Name
+			for _, item2 in ipairs(Items:GetChildren()) do
+				if item2.Name == TargetName and item2.PrimaryPart then
+					BringItemWithItem2(item2)
+				end
+				wait()
+			end
+		end
+		wait()
+	end
+end)
+
+local ModeDragLine_2 = Create_Line(ModeDrag_SelectFuntion, "อาหาร 🍇")
+local Drop_Food_Item, Drop_Food_Item_List, ResetButton_Bring_Food_Item = Create_SelectPick(ModeDrag_SelectFuntion, "เลือกไอเท็ม", 5)
+ResetButton_Bring_Food_Item.Visible = false
+for _, Item_In_Game in ipairs(Item_Food_Teble) do
+	local NewButton = Create_Toggle_InSC(Drop_Food_Item, Item_In_Game)
+	NewButton.Activated:Connect(function()
+		if Drop_Food_Item_List:FindFirstChild(Item_In_Game) then
+			Drop_Food_Item_List:FindFirstChild(Item_In_Game):Destroy()
+		else
+			local NewTag = Instance.new("RayValue", Drop_Food_Item_List) ; NewTag.Name = Item_In_Game
+		end
+	end)
+	wait()
+end
+local Bring_Food_Button = Create_Click(ModeDrag_SelectFuntion, "ดึงอาหารที่เลือก")
+Bring_Food_Button.Activated:Connect(function()	
+	for _, item2 in ipairs(Drop_Food_Item_List:GetChildren()) do
+		if item2:IsA("RayValue") then
+			local TargetName = item2.Name
+			for _, item2 in ipairs(Items:GetChildren()) do
+				if item2.Name == TargetName and item2.PrimaryPart then
+					BringItemWithItem2(item2)
+				end
+				wait()
+			end
+		end
+		wait()
+	end
+end)
+
+local ModeDragLine_2 = Create_Line(ModeDrag_SelectFuntion, "เศษเหล็ก 🧲")
+local Drop_Scrap_Item, Drop_Scrap_Item_List, ResetButton_Bring_Scrap_Item = Create_SelectPick(ModeDrag_SelectFuntion, "เลือกไอเท็ม", 10)
+ResetButton_Bring_Scrap_Item.Visible = false
+for _, Item_In_Game in ipairs(Item_Scrap_Teble) do
+	local NewButton = Create_Toggle_InSC(Drop_Scrap_Item, Item_In_Game)
+	NewButton.Activated:Connect(function()
+		if Drop_Scrap_Item_List:FindFirstChild(Item_In_Game) then
+			Drop_Scrap_Item_List:FindFirstChild(Item_In_Game):Destroy()
+		else
+			local NewTag = Instance.new("RayValue", Drop_Scrap_Item_List) ; NewTag.Name = Item_In_Game
+		end
+	end)
+	wait()
+end
+local Bring_Scrap_Button = Create_Click(ModeDrag_SelectFuntion, "ดึงเศษเหล็กที่เลือก")
+Bring_Scrap_Button.Activated:Connect(function()	
+	for _, item2 in ipairs(Drop_Scrap_Item_List:GetChildren()) do
+		if item2:IsA("RayValue") then
+			local TargetName = item2.Name
+			for _, item2 in ipairs(Items:GetChildren()) do
+				if item2.Name == TargetName and item2.PrimaryPart then
+					BringItemWithItem2(item2)
+				end
+				wait()
+			end
+		end
+		wait()
+	end
+end)
+
+local ModeDragLine_3 = Create_Line(ModeDrag_SelectFuntion, "ไอเท็มที่มีขณะนี้ 📦")
 
 local function ResetAllItemInServer()
 	for _, item in ipairs(ModeDrag_SelectFuntion:GetChildren()) do
@@ -1005,31 +1194,7 @@ local function ResetAllItemInServer()
 			NewBring_Button.Activated:Connect(function()
 				for _, item2 in ipairs(Items:GetChildren()) do
 					if item2.Name == item.Name and item2.PrimaryPart then
-						if Target == "Character" then
-							item2.PrimaryPart.CFrame = HMNRT.CFrame
-							wait(0.1)
-							RequestStartDraggingItem:FireServer(item2)
-							wait(0.1)
-							StopDraggingItem:FireServer(item2)
-						elseif Target == "Craft" then
-							item2.PrimaryPart.CFrame = DashedLine.CFrame * CFrame.new(0,7,0)
-							wait(0.1)
-							RequestStartDraggingItem:FireServer(item2)
-							wait(0.1)
-							StopDraggingItem:FireServer(item2)
-						elseif Target == "NearCamp" then
-							item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(-15,0,0)
-							wait(0.1)
-							RequestStartDraggingItem:FireServer(item2)
-							wait(0.1)
-							StopDraggingItem:FireServer(item2)
-						elseif Target == "Fire" then
-							item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(0,15,0)
-							wait(0.1)
-							RequestStartDraggingItem:FireServer(item2)
-							wait(0.1)
-							StopDraggingItem:FireServer(item2)
-						end
+						BringItemWithItem2(item2)
 					end
 					wait()
 				end
