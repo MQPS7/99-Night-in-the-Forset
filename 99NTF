@@ -57,16 +57,16 @@ end
 local function UnEquip()
 	if Inventory:FindFirstChild("Old Axe") then
 		local Old_Axe = Inventory:FindFirstChild("Old Axe")
-		--UnequipItemHandle:FireServer("FireAllClients",Old_Axe)
+		UnequipItemHandle:FireServer("FireAllClients",Old_Axe)
 	elseif Inventory:FindFirstChild("Good Axe") then
 		local Good_Axe = Inventory:FindFirstChild("Good Axe")
-		--UnequipItemHandle:FireServer("FireAllClients",Good_Axe)
+		UnequipItemHandle:FireServer("FireAllClients",Good_Axe)
 	elseif Inventory:FindFirstChild("Strong Axe") then
 		local Strong_Axe = Inventory:FindFirstChild("Strong Axe")
-		--UnequipItemHandle:FireServer("FireAllClients",Strong_Axe)
+		UnequipItemHandle:FireServer("FireAllClients",Strong_Axe)
 	end
 	if character:FindFirstChild("ToolHandle") then
-		--character:FindFirstChild("ToolHandle"):Destroy()
+		character:FindFirstChild("ToolHandle"):Destroy()
 	end
 end
 
@@ -123,20 +123,20 @@ local function createSlider(sliderTrack, sliderThumb, onSlide, MaxValue)
 		end
 	end
 	sliderTrack.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 			dragging = true
 			local relativeX = input.Position.X - sliderTrack.AbsolutePosition.X - sliderThumb.AbsoluteSize.X / 2
 			tweenSliderTo(relativeX)
 		end
 	end)
 	UIS.InputChanged:Connect(function(input)
-		if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
 			local relativeX = input.Position.X - sliderTrack.AbsolutePosition.X - sliderThumb.AbsoluteSize.X / 2
 			tweenSliderTo(relativeX)
 		end
 	end)
 	UIS.InputEnded:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 			dragging = false
 		end
 	end)
@@ -269,6 +269,7 @@ end
 
 local function MakeTextBox(Parent, Size, Posi, BGtran, Color , Text)
 	local NewFrame = Instance.new("TextBox", Parent)
+	local UICorner = Instance.new("UICorner", NewFrame)
 	NewFrame.Position = Posi
 	NewFrame.Size = Size
 	NewFrame.BackgroundTransparency = BGtran
@@ -471,6 +472,8 @@ local ModeTeleport, ModeTeleport_SelectFuntion = Create_ModeButton(" เทเ�
 
 local ModeDrag, ModeDrag_SelectFuntion = Create_ModeButton(" ดึงของ / ย้าย 📦 ")
 
+--local ModeEsp, ModeEsp_SelectFuntion = Create_ModeButton(" การมองเห็น 👁️ ")
+
 ---- End!!
 
 local function Create_Line(Parent, Name)
@@ -636,7 +639,7 @@ end
 local function Create_Slide_Textbox(Parent, Name, NameInTextBox, ValueNow)
 	local MainButton1 = MakeFrame(ScreenGui, UDim2.new(0, 248,0, 114), UDim2.new(0, 0,0, 0), 0, Color3.new(0.141176, 0.12549, 0.368627), true, true)
 	local TextMainButton1 = MakeText(MainButton1, UDim2.new(0, 131,0, 28), UDim2.new(0.055, 0,0.076, 0), 1, Color3.new(0.529412, 0.313725, 1), true, Name)
-	local TextBox = MakeTextBox(MainButton1, UDim2.new(0, 158,0, 29), UDim2.new(0.055, 0,0.673, 0), 1, Color3.new(0.596078, 0.32549, 1) , NameInTextBox)
+	local TextBox = MakeTextBox(MainButton1, UDim2.new(0, 158,0, 29), UDim2.new(0.055, 0,0.673, 0), 0.9, Color3.new(0.596078, 0.32549, 1) , NameInTextBox)
 	local ColorMainButton1 = MakeFrame(MainButton1, UDim2.new(0, 8,0, 114), UDim2.new(0, 0,0, 0), 0, Color3.new(0.145098, 0.133333, 0.392157), true, true)
 	local ShowValue = MakeText(MainButton1, UDim2.new(0, 59,0, 25), UDim2.new(0.734, 0,0.687, 0), 1, Color3.new(0.466667, 0.286275, 1), true, ValueNow)	
 	local SlideBar = MakeFrame(MainButton1, UDim2.new(0, 222,0, 8), UDim2.new(0.065, 0,0.439, 0), 0, Color3.new(0.494118, 0.258824, 1), true, true)
@@ -898,7 +901,7 @@ end)
 local ModeDragLine_1 = Create_Line(ModeFarm_SelectFuntion, "ต่อสู้ 🗡️")
 
 local KillAura_Button = Create_Toggle(ModeFarm_SelectFuntion, "คิลออร่า")
-KillAura_Button.Activated:Connect(function()
+local KillAura = false;KillAura_Button.Activated:Connect(function()
 	if KillAura == false then
 		KillAura = true
 	else
@@ -1038,6 +1041,50 @@ end
 ModeDrag.Activated:Connect(function()
 	ResetAllItemInServer()
 end)
+
+---------------- **** ModeEsp_SelectFuntion **** ----------------
+
+local function Esp_function(Model, In1)
+	if In1 == true then
+		if Model then
+			if not Model:FindFirstChild("SomEs") then
+				local Highlight = Instance.new("Highlight", Model)
+				Highlight.Name = "SomEs"
+				Highlight.FillColor = Model.PrimaryPart.Color
+			end
+		end
+	else
+		if Model:FindFirstChild("SomEs") then
+			Model:FindFirstChild("SomEs"):Destroy()
+		end
+	end
+end
+
+--local EspMob_Button = Create_Toggle(ModeEsp_SelectFuntion, "มองทะลุม็อบ")
+--local EspMob = false;EspMob_Button.Activated:Connect(function()
+--	if EspMob == false then
+--		EspMob = true
+--		
+--		for _, item in ipairs(workspace.Characters:GetChildren()) do
+--			if item:IsA("Model") then
+--				Esp_function(item, true)
+--			end
+--			wait()
+--		end
+--		
+--	else
+--		EspMob = false
+--		
+--		for _, item in ipairs(workspace.Characters:GetChildren()) do
+--			if item:IsA("Model") then
+--				Esp_function(item, false)
+--			end
+--			wait()
+--		end
+--		
+--	end	
+--end)
+
 
 ---------------- **** ModeTeleport_SelectFuntion **** ----------------
 
