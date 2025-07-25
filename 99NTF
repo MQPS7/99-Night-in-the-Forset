@@ -1073,8 +1073,10 @@ for _, Item_In_Game in ipairs(Item_Fuel_Teble) do
 	end)
 	wait()
 end
-local Bring_Fuel_Button = Create_Click(ModeDrag_SelectFuntion, "ดึงเชื้อเพลิงที่เลือก")
+local Bring_Fuel_Button, Bring_Fuel_Button_Text = Create_Click(ModeDrag_SelectFuntion, "ดึงเชื้อเพลิงที่เลือก")
 Bring_Fuel_Button.Activated:Connect(function()	
+	Bring_Fuel_Button_Text.Text = "กำลังดึงเชื้อเพลิงที่เลือก"
+	Bring_Fuel_Button.Active = false
 	for _, item2 in ipairs(Drop_Fuel_Item_List:GetChildren()) do
 		if item2:IsA("RayValue") then
 			local TargetName = item2.Name
@@ -1087,6 +1089,8 @@ Bring_Fuel_Button.Activated:Connect(function()
 		end
 		wait()
 	end
+	Bring_Fuel_Button_Text.Text = "ดึงเชื้อเพลิงที่เลือก"
+	Bring_Fuel_Button.Active = true
 end)
 local ModeDragLine_2 = Create_Line(ModeDrag_SelectFuntion, "อาวุธ 💣")
 
@@ -1103,8 +1107,10 @@ for _, Item_In_Game in ipairs(Item_Weapon_Teble) do
 	end)
 	wait()
 end
-local Bring_Weapon_Button = Create_Click(ModeDrag_SelectFuntion, "ดึงอาวุธ")
+local Bring_Weapon_Button, Bring_Weapon_Button_Text = Create_Click(ModeDrag_SelectFuntion, "ดึงอาวุธที่เลือก")
 Bring_Weapon_Button.Activated:Connect(function()	
+	Bring_Weapon_Button_Text.Text = "กำลังดึงอาวุธ"
+	Bring_Weapon_Button.Active = false
 	for _, item2 in ipairs(Drop_Weapon_Item_List:GetChildren()) do
 		if item2:IsA("RayValue") then
 			local TargetName = item2.Name
@@ -1117,6 +1123,8 @@ Bring_Weapon_Button.Activated:Connect(function()
 		end
 		wait()
 	end
+	Bring_Weapon_Button_Text.Text = "ดึงอาวุธที่เลือก"
+	Bring_Weapon_Button.Active = true
 end)
 
 local ModeDragLine_2 = Create_Line(ModeDrag_SelectFuntion, "อาหาร 🍇")
@@ -1133,8 +1141,10 @@ for _, Item_In_Game in ipairs(Item_Food_Teble) do
 	end)
 	wait()
 end
-local Bring_Food_Button = Create_Click(ModeDrag_SelectFuntion, "ดึงอาหารที่เลือก")
-Bring_Food_Button.Activated:Connect(function()	
+local Bring_Food_Button, Bring_Food_Button_Text = Create_Click(ModeDrag_SelectFuntion, "ดึงอาหารที่เลือก")
+Bring_Food_Button.Activated:Connect(function()
+	Bring_Food_Button_Text.Text = "กำลังดึงอาหารที่เลือก"
+	Bring_Food_Button.Active = false
 	for _, item2 in ipairs(Drop_Food_Item_List:GetChildren()) do
 		if item2:IsA("RayValue") then
 			local TargetName = item2.Name
@@ -1147,6 +1157,8 @@ Bring_Food_Button.Activated:Connect(function()
 		end
 		wait()
 	end
+	Bring_Food_Button_Text.Text = "ดึงอาหารที่เลือก"
+	Bring_Food_Button.Active = true
 end)
 
 local ModeDragLine_2 = Create_Line(ModeDrag_SelectFuntion, "เศษเหล็ก 🧲")
@@ -1163,8 +1175,10 @@ for _, Item_In_Game in ipairs(Item_Scrap_Teble) do
 	end)
 	wait()
 end
-local Bring_Scrap_Button = Create_Click(ModeDrag_SelectFuntion, "ดึงเศษเหล็กที่เลือก")
+local Bring_Scrap_Button, Bring_Scrap_Button_Text = Create_Click(ModeDrag_SelectFuntion, "ดึงเศษเหล็กที่เลือก")
 Bring_Scrap_Button.Activated:Connect(function()	
+	Bring_Scrap_Button_Text.Text = "กำลังดึงเศษเหล็กที่เลือก"
+	Bring_Scrap_Button.Active = false
 	for _, item2 in ipairs(Drop_Scrap_Item_List:GetChildren()) do
 		if item2:IsA("RayValue") then
 			local TargetName = item2.Name
@@ -1177,6 +1191,8 @@ Bring_Scrap_Button.Activated:Connect(function()
 		end
 		wait()
 	end
+	Bring_Scrap_Button_Text.Text = "ดึงเศษเหล็กที่เลือก"
+	Bring_Scrap_Button.Active = true
 end)
 
 local ModeDragLine_3 = Create_Line(ModeDrag_SelectFuntion, "ไอเท็มที่มีขณะนี้ 📦")
@@ -1252,6 +1268,32 @@ end
 
 
 ---------------- **** ModeTeleport_SelectFuntion **** ----------------
+
+local GobackToCamp_Button = Create_Toggle(ModeTeleport_SelectFuntion, "วาร์ปไปที่กองไฟเมื่อค่ำ")
+local GobackToCamp = false;GobackToCamp_Button.Activated:Connect(function()
+	if GobackToCamp == false then
+		GobackToCamp = true
+	else
+		GobackToCamp = false
+		Lighting.Brightness = 1
+	end	
+end)
+
+task.spawn(function()
+	local Warpped = false
+	while wait(0.5) do
+		if GobackToCamp == true then
+			if Lighting.ClockTime > 18 then
+				if Warpped == false then
+					HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,7,0)
+					Warpped = true
+				end
+			else
+				Warpped = false
+			end
+		end
+	end
+end)
 
 local ModeTeleportLine_1 = Create_Line(ModeTeleport_SelectFuntion, "สถานที่ 🌍")
 
