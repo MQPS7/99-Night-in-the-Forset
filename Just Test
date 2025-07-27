@@ -16,11 +16,14 @@ local Map = workspace:WaitForChild("Map")
 local InnerTouchZone = Map:WaitForChild("Campground"):WaitForChild("MainFire"):WaitForChild("InnerTouchZone")
 local CraftProx = Map:WaitForChild("Campground"):WaitForChild("CraftingBench"):WaitForChild("TouchZone"):WaitForChild("ProximityAttachment"):WaitForChild("ProximityInteraction")
 local DashedLine = Map:WaitForChild("Campground"):WaitForChild("Scrapper"):WaitForChild("DashedLine")
-local RequestStartDraggingItem = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("RequestStartDraggingItem")
-local StopDraggingItem = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("StopDraggingItem")
-local UnequipItemHandle = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("UnequipItemHandle")
-local EquipItemHandle = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("EquipItemHandle")
-local ToolDamageObject = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("ToolDamageObject")
+local RemoteEvents = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents")
+local RequestStartDraggingItem = RemoteEvents:FindFirstChild("RequestStartDraggingItem")
+local StopDraggingItem = RemoteEvents:FindFirstChild("StopDraggingItem")
+local UnequipItemHandle = RemoteEvents:WaitForChild("UnequipItemHandle")
+local EquipItemHandle = RemoteEvents:FindFirstChild("EquipItemHandle")
+local ToolDamageObject = RemoteEvents:WaitForChild("ToolDamageObject")
+local RequestHotbarItem = RemoteEvents:FindFirstChild("RequestHotbarItem")
+local RequestConsumeItem = RemoteEvents:FindFirstChild("RequestConsumeItem")
 
 local PlayerAxe = nil ; local Auto_FOOD = false
 
@@ -64,10 +67,6 @@ local function UnEquip()
 		character:FindFirstChild("ToolHandle"):Destroy()
 	end
 end
-
-local RequestHotbarItem = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("RequestHotbarItem")
-local RequestConsumeItem = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("RequestConsumeItem")
-
 local function MakeDraggableButton(button: ImageButton, MoveFrame)
 	local dragging = false;	local dragStart
 	local startPos;	local firstPos
@@ -98,7 +97,6 @@ local function MakeDraggableButton(button: ImageButton, MoveFrame)
 		end
 	end)
 end
-
 local function createSlider(sliderTrack, sliderThumb, onSlide, MaxValue)
 	local dragging = false
 	MaxValue = MaxValue or 100
@@ -164,13 +162,11 @@ local function tweenFrameSize(frame, newSize, time)
 	local goal = {Size = newSize}
 	TweenService:Create(frame, tweenInfo, goal):Play()
 end
-
 local function tweenFramePosition(frame, newPosition, time)
 	local tweenInfo = TweenInfo.new(time or 0.2,Enum.EasingStyle.Sine,Enum.EasingDirection.Out)
 	local goal = {Position = newPosition}
 	TweenService:Create(frame, tweenInfo, goal):Play()
 end
-
 task.spawn(function()
 	local fullText = ">>> SOMTANK-Script <<<" ; local windowSize = 6
 	while true do
@@ -181,7 +177,6 @@ task.spawn(function()
 		end
 	end
 end)
-
 local function MakeTextButton(Parent, Size, Posi, BGtran, Color, Text)
 	local NewFrame = Instance.new("TextButton", Parent)
 	NewFrame.Position = Posi
@@ -193,7 +188,6 @@ local function MakeTextButton(Parent, Size, Posi, BGtran, Color, Text)
 	NewFrame.Font = Enum.Font.Highway
 	return NewFrame
 end
-
 local function MakeImageButton(Parent, Size, Posi, BGtran, Color, Imtran, imageID)
 	local NewFrame = Instance.new("ImageButton", Parent)
 	local UICorner = Instance.new("UICorner", NewFrame)
@@ -207,7 +201,6 @@ local function MakeImageButton(Parent, Size, Posi, BGtran, Color, Imtran, imageI
 	NewFrame.ZIndex = 2
 	return NewFrame
 end
-
 local function MakeText(Parent, Size, Posi, BGtran, Color, Visible, Text)
 	local NewFrame = Instance.new("TextLabel", Parent)
 	NewFrame.Position = Posi
@@ -220,7 +213,6 @@ local function MakeText(Parent, Size, Posi, BGtran, Color, Visible, Text)
 	NewFrame.Font = Enum.Font.Highway
 	return NewFrame
 end
-
 local function MakeFrame(Parent, Size, Posi, BGtran, Color, Visible, UiConner)
 	local NewFrame = Instance.new("Frame", Parent)
 	NewFrame.Position = Posi
@@ -234,7 +226,6 @@ local function MakeFrame(Parent, Size, Posi, BGtran, Color, Visible, UiConner)
 	end	
 	return NewFrame
 end
-
 local function MakeScrolling(Parent, Size, Posi, BGtran, Color, Visible)
 	local NewFrame = Instance.new("ScrollingFrame", Parent)
 	local UIListLayout = Instance.new("UIListLayout", NewFrame)
@@ -247,7 +238,6 @@ local function MakeScrolling(Parent, Size, Posi, BGtran, Color, Visible)
 	UIListLayout.Padding = UDim.new(0,7)
 	return NewFrame
 end
-
 local function MakeImageLabel(Parent, Size, Posi, BGtran, Color, Imtran, ImageID)
 	local NewFrame = Instance.new("ImageLabel", Parent)
 	NewFrame.Position = Posi
@@ -258,7 +248,6 @@ local function MakeImageLabel(Parent, Size, Posi, BGtran, Color, Imtran, ImageID
 	NewFrame.ImageColor3 = Color
 	return NewFrame
 end
-
 local function MakeTextBox(Parent, Size, Posi, BGtran, Color , Text)
 	local NewFrame = Instance.new("TextBox", Parent)
 	local UICorner = Instance.new("UICorner", NewFrame)
@@ -273,11 +262,9 @@ local function MakeTextBox(Parent, Size, Posi, BGtran, Color , Text)
 	NewFrame.Font = Enum.Font.Highway
 	return NewFrame
 end
-
 local MainFrame = MakeFrame(ScreenGui, UDim2.new(0, 417,0, 299)
 	, UDim2.new(0.246, 0,0.100, 0), 0.07---0.07
 	, Color3.new(1, 1, 1), true, true)
-
 local MovePad = MakeImageLabel(MainFrame, UDim2.new(0, 344,0, 43)
 	, UDim2.new(0, 0,0, 0), 1
 	, Color3.new(1, 1, 1), 0, "")
@@ -286,7 +273,6 @@ local SelectMode = MakeScrolling(MainFrame, UDim2.new(0, 193,0, 247)
 	, UDim2.new(-0.101, 0,0.144, 0), 1
 	, Color3.new(0.0980392, 0.0745098, 0.219608), true, true)
 SelectMode.Name = "SelectMode"
-
 local Line = MakeFrame(MainFrame, UDim2.new(0, 3,0, 247), UDim2.new(0.37, 0,0.144, 0), 0, Color3.new(1, 1, 1), true, true)
 task.spawn(function()
 	local gradient = Instance.new("UIGradient", Line); gradient.Rotation = 90; gradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0, Color3.fromRGB(106, 20, 255)), 	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(187, 147, 255)), ColorSequenceKeypoint.new(1, Color3.fromRGB(106, 20, 255))}
@@ -298,7 +284,6 @@ task.spawn(function()
 		end
 	end
 end)
-
 local Close_EYE = MakeTextButton(MainFrame, UDim2.new(0, 26,0, 24)
 	, UDim2.new(0.825, 0,0.013, 0), 1
 	, Color3.new(0.466667, 0.113725, 1), "-")
@@ -310,7 +295,6 @@ local Close_Panal = MakeTextButton(MainFrame, UDim2.new(0, 26,0, 24)
 Close_EYE.Activated:Connect(function()
 	MainFrame.Visible = false
 end)
-
 local LoadingFrame = MakeFrame(MainFrame, UDim2.new(0, 417,0, 299), UDim2.new(0, 0,0, 0), 0, Color3.new(0.0980392, 0.0745098, 0.219608), true, true)
 local LoadingBar1 = MakeFrame(LoadingFrame, UDim2.new(0, 253,0, 11), UDim2.new(0.197, 0,0.807, 0), 0, Color3.new(0.0509804, 0.0392157, 0.117647), true, true)
 local LoadingBar2 = MakeFrame(LoadingFrame, UDim2.new(0, 0,0, 11), UDim2.new(0.197, 0,0.807, 0), 0, Color3.new(0.368627, 0.286275, 0.854902), true, true)
@@ -350,7 +334,6 @@ task.spawn(function()
 		end
 	end
 end)
-
 local IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 local TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
 local VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.4")
@@ -358,7 +341,6 @@ local FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextTransparency = 0.4
-
 local MoveIcon = MakeImageButton(ScreenGui, UDim2.new(0, 53,0, 51), UDim2.new(0.100, 0,0.447, 0), 1, Color3.new(1, 1, 1), 0, "rbxassetid://81129676934693")
 local FOR_MoveIcon = Instance.new("UIAspectRatioConstraint", MoveIcon)
 MakeDraggableButton(MoveIcon, MoveIcon)
@@ -380,7 +362,6 @@ end)
 MoveIcon.MouseLeave:Connect(function()
 	MoveIcon.ImageColor3 = Color3.new(1, 1, 1)
 end)
-
 local SelectMode_Now = MainFrame
 local function Create_ModeButton(Name)
 	local MainButton1 = MakeFrame(ScreenGui, UDim2.new(0, 191,0, 36), UDim2.new(0, 0,0, 0), 1, Color3.new(0.141176, 0.12549, 0.368627), true, true)
@@ -445,7 +426,6 @@ local function Create_ModeButton(Name)
 	MainButton1.Visible = true
 	return Button1 , SelectFuntion
 end
-
 -----   สร้างหมวดหหมู่  [ Create Mode ]
 
 local ModePlayer, ModePlayer_SelectFuntion = Create_ModeButton(" ผู้เล่น 👤 ")
@@ -459,7 +439,6 @@ local ModeDrag, ModeDrag_SelectFuntion = Create_ModeButton(" ดึงของ 
 local ModeAuto, ModeAuto_SelectFuntion = Create_ModeButton(" อัตโนมัติ ⚡ ")
 
 ---- End!!
-
 local function Create_Line(Parent, Name)
 	local MainButton1 = MakeFrame(ScreenGui, UDim2.new(0, 248,0, 24), UDim2.new(0, 0,0, 0), 1, Color3.new(0.141176, 0.12549, 0.368627), true, true)
 	local TextMainButton1 = MakeText(MainButton1, UDim2.new(0.916, 0,1, 0), UDim2.new(0.095, 0,-0.007, 0), 1, Color3.new(0.529412, 0.313725, 1), true, "<b> " .. Name .. " </b>")
@@ -473,7 +452,6 @@ local function Create_Line(Parent, Name)
 	TextMainButton1.TextXAlignment = Enum.TextXAlignment.Left
 	return MainButton1
 end
-
 local function Create_Toggle(Parent, Name)
 	local MainButton1 = MakeFrame(ScreenGui, UDim2.new(0, 248,0, 36), UDim2.new(0, 0,0, 0), 0, Color3.new(0.141176, 0.12549, 0.368627), true, true)
 	local TextMainButton1 = MakeText(MainButton1, UDim2.new(0, 131,0, 28), UDim2.new(0.055, 0,0.076, 0), 1, Color3.new(0.529412, 0.313725, 1), true, Name)
@@ -498,7 +476,6 @@ local function Create_Toggle(Parent, Name)
 	MainButton1.Visible = true
 	return Button1, TextMainButton1
 end
-
 local function Create_Click(Parent, Name, Name2)
 	local MainButton1 = MakeFrame(ScreenGui, UDim2.new(0, 248,0, 36), UDim2.new(0, 0,0, 0), 0, Color3.new(0.141176, 0.12549, 0.368627), true, true)
 	local TextMainButton1 = MakeText(MainButton1, UDim2.new(0, 131,0, 28), UDim2.new(0.055, 0,0.076, 0), 1, Color3.new(0.529412, 0.313725, 1), true, Name)
@@ -523,7 +500,6 @@ local function Create_Click(Parent, Name, Name2)
 	MainButton1.Visible = true
 	return Button1, TextMainButton1, MainButton1
 end
-
 local function Create_SelectPick(Parent, Name, CanvasSize)
 	local MainButton1 = MakeFrame(ScreenGui, UDim2.new(0, 248,0, 36), UDim2.new(0, 0,0, 0), 0, Color3.new(0.141176, 0.12549, 0.368627), true, true)
 	local TextMainButton1 = MakeText(MainButton1, UDim2.new(0, 149,0, 28), UDim2.new(0.055, 0,0.02, 0), 1, Color3.new(0.529412, 0.313725, 1), true, Name)
@@ -572,7 +548,6 @@ local function Create_SelectPick(Parent, Name, CanvasSize)
 	local Info_Folder = Instance.new("Folder", MainButton1)	
 	return Scrolling, Info_Folder, ResetButton
 end
-
 local function Create_Click_InSC(Parent, Name)
 	local MainButton1 = MakeFrame(ScreenGui, UDim2.new(0, 228,0, 33), UDim2.new(0, 0,0, 0), 0, Color3.new(0.164706, 0.152941, 0.443137), true, true)
 	local TextMainButton1 = MakeText(MainButton1, UDim2.new(0, 131,0, 28), UDim2.new(0.055, 0,0.076, 0), 1, Color3.new(0.529412, 0.313725, 1), true, Name)
@@ -594,7 +569,6 @@ local function Create_Click_InSC(Parent, Name)
 	MainButton1.Visible = true
 	return Button1, ColorMainButton1
 end
-
 local function Create_Toggle_InSC(Parent, Name)
 	local MainButton1 = MakeFrame(ScreenGui, UDim2.new(0, 228,0, 33), UDim2.new(0, 0,0, 0), 0, Color3.new(0.164706, 0.152941, 0.443137), true, true)
 	local TextMainButton1 = MakeText(MainButton1, UDim2.new(0, 131,0, 28), UDim2.new(0.055, 0,0.076, 0), 1, Color3.new(0.529412, 0.313725, 1), true, Name)
@@ -619,7 +593,6 @@ local function Create_Toggle_InSC(Parent, Name)
 	MainButton1.Visible = true
 	return Button1, ColorMainButton1
 end
-
 local function Create_Slide_Textbox(Parent, Name, NameInTextBox, ValueNow)
 	local MainButton1 = MakeFrame(ScreenGui, UDim2.new(0, 248,0, 114), UDim2.new(0, 0,0, 0), 0, Color3.new(0.141176, 0.12549, 0.368627), true, true)
 	local TextMainButton1 = MakeText(MainButton1, UDim2.new(0, 131,0, 28), UDim2.new(0.055, 0,0.076, 0), 1, Color3.new(0.529412, 0.313725, 1), true, Name)
@@ -642,7 +615,6 @@ local function Create_Slide_Textbox(Parent, Name, NameInTextBox, ValueNow)
 	MainButton1.Visible = true
 	return SlideBar, Bar, TextBox, ShowValue, ColorMainButton1, ResetButton
 end
-
 local function matchesAllowedKeyword(value, allowedKeywords)
 	value = value:lower()
 	for _, keyword in ipairs(allowedKeywords) do
@@ -652,11 +624,8 @@ local function matchesAllowedKeyword(value, allowedKeywords)
 	end
 	return false
 end
-
 ---------------- **** ModePlayer_SelectFuntion ****
-
 local ModePlayer1 = Create_Line(ModePlayer_SelectFuntion, "การเคลื่อนไหว")
-
 local WalkSpeed = 16 ; local Defalse_WalkSpeed = 16
 local PlayerSpeed_SlideBar, PlayerSpeed_Bar, PlayerSpeed_TextBox, PlayerSpeed_ShowValue, PlayerSpeed_Color, PlayerSpeed_ResetButton = Create_Slide_Textbox(ModePlayer_SelectFuntion, "ความเร็วการเดิน", "ใส่ค่าที่ต้องการเลยครับ", WalkSpeed)
 local function SetSlider(Bar, Slide, Defalse_Value, Color)
@@ -732,7 +701,6 @@ local function SetSlider2(Bar, Slide, Defalse_Value, Color)
 	end)
 end
 SetSlider2(JumpPower_SlideBar, JumpPower_Bar, Defalse_JumpPower, JumpPower_Color)
-
 local Infinit_Jump_Button, Infinit_Jump_Text = Create_Toggle(ModePlayer_SelectFuntion, "กระโดดไม่จำกัด")
 local Infinit_Jump = false;Infinit_Jump_Button.Activated:Connect(function()
 	if Infinit_Jump == false then
@@ -746,7 +714,6 @@ UIS.JumpRequest:Connect(function()
 		humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 	end
 end)
-
 local Active_Fly_Button = Create_Toggle(ModePlayer_SelectFuntion, "บิน")
 local Active_Fly = false;Active_Fly_Button.Activated:Connect(function()
 	if Active_Fly == false then
@@ -756,7 +723,6 @@ local Active_Fly = false;Active_Fly_Button.Activated:Connect(function()
 		Active_Fly = false		
 	end	
 end)
-
 local Fly_Speed = 1 ; local Max_Fly_Speed = 10
 local Fly_Speed_SlideBar, Fly_Speed_Bar, Fly_Speed_TextBox, Fly_Speed_ShowValue, Fly_Speed_Color, Fly_Speed_ResetButton = Create_Slide_Textbox(ModePlayer_SelectFuntion, "ความเร็วการบิน", "ใส่ค่าที่ต้องการเลยครับ", Fly_Speed)
 local function SetSlider3(Bar, Slide, Defalse_Value, Color)
@@ -790,7 +756,6 @@ local function SetSlider3(Bar, Slide, Defalse_Value, Color)
 	end)
 end
 SetSlider3(Fly_Speed_SlideBar, Fly_Speed_Bar, Fly_Speed, Fly_Speed_Color)
-
 function Fly()
 	wait()
 	local Human = humanoid
@@ -831,9 +796,7 @@ function Fly()
 	Human.PlatformStand = false
 	Human.AutoRotate = true
 end
-
 local ModePlayer2 = Create_Line(ModePlayer_SelectFuntion, "แสงและเงา 💡")
-
 local Nofog_Button = Create_Toggle(ModePlayer_SelectFuntion, "ปิดหมอก")
 local Nofog = false;Nofog_Button.Activated:Connect(function()
 	if Nofog == false then
@@ -844,7 +807,6 @@ local Nofog = false;Nofog_Button.Activated:Connect(function()
 		Lighting.FogStart = 50
 	end	
 end)
-
 task.spawn(function()
 	while wait(0.5) do
 		if Nofog == true then
@@ -853,7 +815,6 @@ task.spawn(function()
 		end
 	end
 end)
-
 local Brightness_Button = Create_Toggle(ModePlayer_SelectFuntion, "เพิ่มแสง")
 local Brightness = false;Brightness_Button.Activated:Connect(function()
 	if Brightness == false then
@@ -863,7 +824,6 @@ local Brightness = false;Brightness_Button.Activated:Connect(function()
 		Lighting.Brightness = 1
 	end	
 end)
-
 task.spawn(function()
 	while wait(0.5) do
 		if Brightness == true then
@@ -871,7 +831,6 @@ task.spawn(function()
 		end
 	end
 end)
-
 local FpsBoostDelete_Button, FpsBoostDeleteText, FpsBoostDeleteMainButton1 = Create_Click(ModePlayer_SelectFuntion, "ลบสิ่งที่ไม่จำเป็นเพิ่ม fps")
 FpsBoostDelete_Button.Activated:Connect(function()
 	FpsBoostDelete_Button.Active = false
@@ -913,11 +872,8 @@ FpsBoostDelete_Button.Activated:Connect(function()
 	FpsBoostDeleteText.Text = "ลบสิ่งที่ไม่จำเป็นเพิ่ม fps"
 	FpsBoostDelete_Button.Active = true
 end)
-
 ---------------- **** ModeFarm_SelectFuntion **** ----------------
-
 local ModeDragLine_1 = Create_Line(ModeFarm_SelectFuntion, "ฟาร์ม 🌾")
-
 local AutoCutTree_Button = Create_Toggle(ModeFarm_SelectFuntion, "ออโต้ตัดไม้")
 local AutoCutTree = false;AutoCutTree_Button.Activated:Connect(function()
 	if AutoCutTree == false then
@@ -927,7 +883,6 @@ local AutoCutTree = false;AutoCutTree_Button.Activated:Connect(function()
 		UnEquip()
 	end
 end)
-
 local KillAura = false ; local OnTopEnameis = false
 local AutoGrape_Button = Create_Toggle(ModeFarm_SelectFuntion, "ออโต้ทำอาหาร")
 local AutoCook = false;AutoGrape_Button.Activated:Connect(function()
@@ -1021,7 +976,7 @@ end)
 
 task.spawn(function()
 	while wait(1) do
-		if FastProxLootBox == true then---workspace.Items:GetChildren()[188].Main.ProximityAttachment.ProximityInteraction
+		if FastProxLootBox == true then
 			for _, item2 in ipairs(Items:GetChildren()) do
 				if item2 and matchesAllowedKeyword(item2.Name, {"Chest"}) and item2.PrimaryPart then
 					pcall(function()
@@ -1041,27 +996,22 @@ end)
 
 local Target = "Character"
 local ModeDragLine_1 = Create_Line(ModeDrag_SelectFuntion, "ดึงไปที่ 📍")
-
 local TarCharacter_Button = Create_Click(ModeDrag_SelectFuntion, "ตัวละคร")
 TarCharacter_Button.Activated:Connect(function()
-	Target = "Character"--HMNRT
+	Target = "Character"
 end)
-
 local TarCraft_Button = Create_Click(ModeDrag_SelectFuntion, "โต๊ะคราฟ")
 TarCraft_Button.Activated:Connect(function()
-	Target = "Craft"--DashedLine
+	Target = "Craft"
 end)
-
 local TarNearCamp_Button = Create_Click(ModeDrag_SelectFuntion, "ข้างๆกองไฟ")
 TarNearCamp_Button.Activated:Connect(function()
-	Target = "NearCamp"--InnerTouchZone * CFrame.new(0,0,-5)
+	Target = "NearCamp"
 end)
-
 local TarFire_Button = Create_Click(ModeDrag_SelectFuntion, "กองไฟ")
 TarFire_Button.Activated:Connect(function()
-	Target = "Fire"--InnerTouchZone
+	Target = "Fire"
 end)
-
 local function BringItemWithItem2(item2)
 	pcall(function()
 		if item2.Name == "Berry" then
@@ -1120,41 +1070,6 @@ local Item_Food_Teble = {"Apple", "Berry", "Cake", "Carrot", "Meat? Sandwich"}
 
 local Item_Scrap_Teble = {"Broken Microwave", "Metal Chair", "Old Car Engine", "Old Radio", "Sheet Metal", "Tyre", "UFO Junk", "UFO Scrap", "Washing Machine"}
 
-local ModeDragLine_2 = Create_Line(ModeDrag_SelectFuntion, "อาวุธ 💣")
-
-local Drop_Weapon_Item, Drop_Weapon_Item_List, ResetButton_Bring_Weapon_Item = Create_SelectPick(ModeDrag_SelectFuntion, "เลือกไอเท็ม", 10)
-ResetButton_Bring_Weapon_Item.Visible = false
-for _, Item_In_Game in ipairs(Item_Weapon_Teble) do
-	local NewButton = Create_Toggle_InSC(Drop_Weapon_Item, Item_In_Game)
-	NewButton.Activated:Connect(function()
-		if Drop_Weapon_Item_List:FindFirstChild(Item_In_Game) then
-			Drop_Weapon_Item_List:FindFirstChild(Item_In_Game):Destroy()
-		else
-			local NewTag = Instance.new("RayValue", Drop_Weapon_Item_List) ; NewTag.Name = Item_In_Game
-		end
-	end)
-	--wait()
-end
-local Bring_Weapon_Button, Bring_Weapon_Button_Text = Create_Click(ModeDrag_SelectFuntion, "ดึงอาวุธที่เลือก")
-Bring_Weapon_Button.Activated:Connect(function()	
-	Bring_Weapon_Button_Text.Text = "กำลังดึงอาวุธ"
-	Bring_Weapon_Button.Active = false
-	for _, item2 in ipairs(Drop_Weapon_Item_List:GetChildren()) do
-		if item2:IsA("RayValue") then
-			local TargetName = item2.Name
-			for _, item2 in ipairs(Items:GetChildren()) do
-				if item2.Name == TargetName and item2.PrimaryPart then
-					BringItemWithItem2(item2)
-				end
-				--wait()
-			end
-		end
-		--wait()
-	end
-	Bring_Weapon_Button_Text.Text = "ดึงอาวุธที่เลือก"
-	Bring_Weapon_Button.Active = true
-end)
-
 local ModeDragLine_2 = Create_Line(ModeDrag_SelectFuntion, "อาหาร 🍇")
 local Drop_Food_Item, Drop_Food_Item_List, ResetButton_Bring_Food_Item = Create_SelectPick(ModeDrag_SelectFuntion, "เลือกไอเท็ม", 5)
 ResetButton_Bring_Food_Item.Visible = false
@@ -1189,7 +1104,7 @@ Bring_Food_Button.Activated:Connect(function()
 	Bring_Food_Button.Active = true
 end)
 
-local ModeDragLine_2 = Create_Line(ModeDrag_SelectFuntion, "เชื้อเพลิง 🔥")
+local ModeDragLine_3 = Create_Line(ModeDrag_SelectFuntion, "เชื้อเพลิง 🔥")
 local Drop_Fuel_Item, Drop_Fuel_Item_List, ResetButton_Bring_Fuel_Item = Create_SelectPick(ModeDrag_SelectFuntion, "เลือกไอเท็ม", 6)
 ResetButton_Bring_Fuel_Item.Visible = false
 for _, Item_In_Game in ipairs(Item_Fuel_Teble) do
@@ -1223,7 +1138,7 @@ Bring_Fuel_Button.Activated:Connect(function()
 	Bring_Fuel_Button.Active = true
 end)
 
-local ModeDragLine_2 = Create_Line(ModeDrag_SelectFuntion, "เศษเหล็ก 🧲")
+local ModeDragLine_4 = Create_Line(ModeDrag_SelectFuntion, "เศษเหล็ก 🧲")
 local Drop_Scrap_Item, Drop_Scrap_Item_List, ResetButton_Bring_Scrap_Item = Create_SelectPick(ModeDrag_SelectFuntion, "เลือกไอเท็ม", 10)
 ResetButton_Bring_Scrap_Item.Visible = false
 for _, Item_In_Game in ipairs(Item_Scrap_Teble) do
@@ -1257,7 +1172,42 @@ Bring_Scrap_Button.Activated:Connect(function()
 	Bring_Scrap_Button.Active = true
 end)
 
-local ModeDragLine_3 = Create_Line(ModeDrag_SelectFuntion, "ไอเท็มที่มีขณะนี้ 📦")
+local ModeDragLine_5 = Create_Line(ModeDrag_SelectFuntion, "อาวุธ 💣")
+
+local Drop_Weapon_Item, Drop_Weapon_Item_List, ResetButton_Bring_Weapon_Item = Create_SelectPick(ModeDrag_SelectFuntion, "เลือกไอเท็ม", 10)
+ResetButton_Bring_Weapon_Item.Visible = false
+for _, Item_In_Game in ipairs(Item_Weapon_Teble) do
+	local NewButton = Create_Toggle_InSC(Drop_Weapon_Item, Item_In_Game)
+	NewButton.Activated:Connect(function()
+		if Drop_Weapon_Item_List:FindFirstChild(Item_In_Game) then
+			Drop_Weapon_Item_List:FindFirstChild(Item_In_Game):Destroy()
+		else
+			local NewTag = Instance.new("RayValue", Drop_Weapon_Item_List) ; NewTag.Name = Item_In_Game
+		end
+	end)
+	--wait()
+end
+local Bring_Weapon_Button, Bring_Weapon_Button_Text = Create_Click(ModeDrag_SelectFuntion, "ดึงอาวุธที่เลือก")
+Bring_Weapon_Button.Activated:Connect(function()	
+	Bring_Weapon_Button_Text.Text = "กำลังดึงอาวุธ"
+	Bring_Weapon_Button.Active = false
+	for _, item2 in ipairs(Drop_Weapon_Item_List:GetChildren()) do
+		if item2:IsA("RayValue") then
+			local TargetName = item2.Name
+			for _, item2 in ipairs(Items:GetChildren()) do
+				if item2.Name == TargetName and item2.PrimaryPart then
+					BringItemWithItem2(item2)
+				end
+				--wait()
+			end
+		end
+		--wait()
+	end
+	Bring_Weapon_Button_Text.Text = "ดึงอาวุธที่เลือก"
+	Bring_Weapon_Button.Active = true
+end)
+
+local ModeDragLine_6 = Create_Line(ModeDrag_SelectFuntion, "ไอเท็มที่มีขณะนี้ 📦")
 
 local function ResetAllItemInServer()
 	for _, item in ipairs(ModeDrag_SelectFuntion:GetChildren()) do
