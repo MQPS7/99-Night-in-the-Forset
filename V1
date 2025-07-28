@@ -24,7 +24,7 @@ local EquipItemHandle = RemoteEvents:FindFirstChild("EquipItemHandle")
 local ToolDamageObject = RemoteEvents:WaitForChild("ToolDamageObject")
 local RequestHotbarItem = RemoteEvents:FindFirstChild("RequestHotbarItem")
 local RequestConsumeItem = RemoteEvents:FindFirstChild("RequestConsumeItem")
-local PlayerAxe = nil ; local Auto_FOOD = false
+local PlayerAxe = nil ; local Auto_FOOD = false ; local DontEquipTool = false
 local function EquipAxe()
 	local AxeFound = nil
 	if Inventory:FindFirstChild("Old Axe") then
@@ -47,21 +47,6 @@ local function EquipAxe()
 		if item:IsA("BasePart") then
 			item.Transparency = 1
 		end
-	end
-end
-local function UnEquip()
-	if Inventory:FindFirstChild("Old Axe") then
-		local Old_Axe = Inventory:FindFirstChild("Old Axe")
-		UnequipItemHandle:FireServer("FireAllClients",Old_Axe)
-	elseif Inventory:FindFirstChild("Good Axe") then
-		local Good_Axe = Inventory:FindFirstChild("Good Axe")
-		UnequipItemHandle:FireServer("FireAllClients",Good_Axe)
-	elseif Inventory:FindFirstChild("Strong Axe") then
-		local Strong_Axe = Inventory:FindFirstChild("Strong Axe")
-		UnequipItemHandle:FireServer("FireAllClients",Strong_Axe)
-	end
-	if character:FindFirstChild("ToolHandle") then
-		character:FindFirstChild("ToolHandle"):Destroy()
 	end
 end
 local function MakeDraggableButton(button: ImageButton, MoveFrame)
@@ -333,7 +318,7 @@ task.spawn(function()
 end)
 local IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 local TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-local VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.4t")
+local VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.5")
 local FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -846,10 +831,13 @@ local AutoCutTree = false;AutoCutTree_Button.Activated:Connect(function()
 	if AutoCutTree == false then
 		humanoid.HipHeight = 60
 		AutoCutTree = true
+		DontEquipTool = true
 	else
 		humanoid.HipHeight = 0
 		AutoCutTree = false
-		UnEquip()
+		DontEquipTool = false
+		HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,7,0)
+		--UnEquip()
 	end
 end)
 local KillAura = false ; local OnTopEnameis = false
@@ -860,11 +848,13 @@ local AutoCook = false;AutoCook_Button.Activated:Connect(function()
 		humanoid.HipHeight = 60
 		KillAura = true
 		OnTopEnameis = true
+		DontEquipTool = true
 	else
 		AutoCook = false
 		humanoid.HipHeight = 0
 		KillAura = false
 		OnTopEnameis = false
+		DontEquipTool = false
 	end	
 end)
 local ModeDragLine_2 = Create_Line(ModeFarm_SelectFuntion, "ต่อสู้ 🗡️")
@@ -874,7 +864,7 @@ local KillAura = false;KillAura_Button.Activated:Connect(function()
 		KillAura = true
 	else
 		KillAura = false
-		UnEquip()
+		--UnEquip()
 	end	
 end)
 
@@ -902,7 +892,7 @@ task.spawn(function()
 	while wait(0.4) do
 		if KillAura == true then
 			if character:FindFirstChild("ToolHandle") then
-				UnEquip()
+				--UnEquip()
 			else
 				EquipAxe()
 			end
@@ -1017,26 +1007,10 @@ local function BringItemWithItem2(item2)
 		end
 	end)
 end
-
-local All_Item_In_Game_Teble = {"Alien", "Alien", "Alpha Wolf Corpse"
-	, "Apple", "Bandage" ,"Bolt", "Broken Fan", "Berry", "Broken Microwave"
-	, "Cake", "Carrot", "Chair", "Coal", "Coin Stack", "Fuel Canister", "Hologram Emitter"
-	, "Iron Body", "Leather Body", "Log", "Meat? Sandwich", "MedKit"
-	, "Metal Chair", "Oil Barrel", "Old Car Engine", "Old Flashlight"	
-	, "Old Radio", "Revolver", "Revolver Ammo", "Rifle", "Rifle Ammo", "Seed Box", "Sheet Metal"
-	, "Strong Axe", "Tyre", "Cultist Gem", "Cultist Prototype"
-	, "Laser Sword", "Raygun", "UFO Junk", "UFO Scrap", "Washing Machine", "Wolf Corpse"
-}
-
 local Item_Fuel_Teble = {"Chair", "Coal", "Fuel Canister", "Log", "Oil Barrel"}
-
-local Item_Weapon_Teble = {"Bandage", "Iron Body", "Leather Body", "MedKit"
-	, "Revolver", "Revolver Ammo", "Rifle", "Rifle Ammo", "Strong Axe", "Laser Sword", "Raygun"}
-
+local Item_Weapon_Teble = {"Bandage", "Iron Body", "Leather Body", "MedKit", "Revolver", "Revolver Ammo", "Rifle", "Rifle Ammo", "Strong Axe", "Laser Sword", "Raygun"}
 local Item_Food_Teble = {"Apple", "Berry", "Cake", "Carrot", "Meat? Sandwich"}
-
 local Item_Scrap_Teble = {"Broken Microwave", "Metal Chair", "Old Car Engine", "Old Radio", "Sheet Metal", "Tyre", "UFO Junk", "UFO Scrap", "Washing Machine"}
-
 local ModeDragLine_2 = Create_Line(ModeDrag_SelectFuntion, "อาหาร 🍇")
 local Drop_Food_Item, Drop_Food_Item_List, ResetButton_Bring_Food_Item = Create_SelectPick(ModeDrag_SelectFuntion, "เลือกไอเท็ม", 5)
 ResetButton_Bring_Food_Item.Visible = false
@@ -1065,7 +1039,6 @@ Bring_Food_Button.Activated:Connect(function()
 				wait()
 			end
 		end
-		--wait()
 	end
 	Bring_Food_Button_Text.Text = "ดึงอาหารที่เลือก"
 	Bring_Food_Button.Active = true
@@ -1340,7 +1313,6 @@ for _, Item_In_Game in ipairs(Auto_Food_Teble) do
 	wait()
 end
 
-
 task.spawn(function()
 	local HungerBar = plrGui:WaitForChild("Interface"):WaitForChild("StatBars"):WaitForChild("HungerBar"):FindFirstChild("Bar")
 	while wait(0.5) do
@@ -1484,7 +1456,7 @@ task.spawn(function()
 	while wait(1) do
 		if AutoCutTree == true and Foliage then
 			if character:FindFirstChild("ToolHandle") then
-				UnEquip()
+				--UnEquip()
 			else
 				EquipAxe()
 			end
@@ -1492,14 +1464,12 @@ task.spawn(function()
 				if item.Name == "Small Tree" and item.PrimaryPart and AutoCutTree == true then
 					pcall(function()
 						HMNRT.CFrame = item.PrimaryPart.CFrame * CFrame.new(math.random(-5,5),67,math.random(-5,5))
-						HMNRT.CFrame = CFrame.lookAt(HMNRT.CFrame.Position, item.PrimaryPart.Position)
 						if PlayerAxe then
 							local CutTree_args = {item,PlayerAxe,"99_98989899",
 								CFrame.new(HMNRT.Position.X, HMNRT.Position.Y, HMNRT.Position.Z, 0.5035070776939392, 0.470787912607193, -0.7244579792022705, 0.000007343664492509561, 0.8384993076324463, 0.5449026226997375, 0.8639910817146301, -0.27436766028404236, 0.4221869111061096)}
 							repeat
 								if item and AutoCutTree == true then
 									HMNRT.CFrame = item.PrimaryPart.CFrame * CFrame.new(math.random(-5,5),67,math.random(-5,5))
-									HMNRT.CFrame = CFrame.lookAt(HMNRT.CFrame.Position, item.PrimaryPart.Position)
 								end
 								ToolDamageObject:InvokeServer(unpack(CutTree_args))
 								wait(0.3)
@@ -1507,7 +1477,6 @@ task.spawn(function()
 							for i=1,3 do
 								if item and AutoCutTree == true then
 									HMNRT.CFrame = item.PrimaryPart.CFrame * CFrame.new(math.random(-5,5),67,math.random(-5,5))
-									HMNRT.CFrame = CFrame.lookAt(HMNRT.CFrame.Position, item.PrimaryPart.Position)
 								end
 								ToolDamageObject:InvokeServer(unpack(CutTree_args))
 								wait(0.3)
@@ -1532,3 +1501,17 @@ Close_Panal.Activated:Connect(function()
 	humanoid.JumpHeight = 7.5
 	humanoid.WalkSpeed = 16
 end)
+while wait(0.5) do
+	if DontEquipTool == true then
+		repeat
+			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "⚠️ ห้ามถืออุปกรต่างๆ",Text = "เพื่อประสิทธิภาพสูงสุด",Duration = 10})
+			local kokooolop = 0
+			repeat
+				wait(0.1)
+				kokooolop = kokooolop + 0.1
+			until kokooolop >= 14 or DontEquipTool == false
+			wait(0.1)
+		until DontEquipTool == false
+	end
+end
+
