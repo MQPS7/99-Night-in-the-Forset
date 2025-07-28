@@ -1440,15 +1440,10 @@ local AutoLoadMap_Button = Create_Toggle(ModeAuto_SelectFuntion, "ออโต�
 local AutoLoadMap = false;AutoLoadMap_Button.Activated:Connect(function()
 	if AutoLoadMap == false then
 		AutoLoadMap = true
-		for i=1,5 do
-			wait()
-			HMNRT.Anchored = true
-		end
 	else
 		AutoLoadMap = false
 		for i=1,5 do
 			wait()
-			HMNRT.Anchored = false
 			HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,7,0)
 		end
 	end	
