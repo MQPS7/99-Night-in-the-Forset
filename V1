@@ -333,7 +333,7 @@ task.spawn(function()
 end)
 local IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 local TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-local VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.4")
+local VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.4w")
 local FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -646,9 +646,20 @@ local function SetSlider(Bar, Slide, Defalse_Value, Color)
 		slider_WalkSpeed.SetValue(Defalse_WalkSpeed)
 	end)	
 	task.spawn(function()
+		local Set_Stop = false
 		while wait(0.05) do
-			PlayerSpeed_ShowValue.Text = WalkSpeed
-			humanoid.WalkSpeed = WalkSpeed
+			PlayerSpeed_ShowValue.Text = WalkSpeed--humanoid.WalkSpeed = WalkSpeed
+			local moveDirection = humanoid.MoveDirection
+			if moveDirection.Magnitude > 0 and tonumber(PlayerSpeed_ShowValue.Text) ~= Defalse_Value then
+				Set_Stop = true
+				local velocity = moveDirection.Unit * WalkSpeed
+				HMNRT.AssemblyLinearVelocity = Vector3.new(velocity.X, HMNRT.AssemblyLinearVelocity.Y, velocity.Z)
+			else
+				if Set_Stop == true then
+					HMNRT.AssemblyLinearVelocity = Vector3.new(0, HMNRT.AssemblyLinearVelocity.Y, 0)
+					Set_Stop = false
+				end
+			end
 			if tonumber(PlayerSpeed_ShowValue.Text) == Defalse_Value then
 				tweenButtonColor(Color, Color3.new(0.145098, 0.133333, 0.392157), 0.17)
 			else
