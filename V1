@@ -318,7 +318,7 @@ task.spawn(function()
 end)
 local IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 local TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-local VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.5")
+local VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.6")
 local FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -1432,9 +1432,9 @@ RunService.RenderStepped:Connect(function(dt)
 			local newPos = InnerTouchZone.Position + offset
 			if HMNRT and newPos and orbitRadius and orbitSpeed then
 				HMNRT.CFrame = CFrame.new(newPos)
-				if orbitRadius < 1400 then
+				if orbitRadius < 1200 then
 					orbitRadius = orbitRadius + 0.5
-					if orbitRadius >= 900 then
+					if orbitRadius >= 800 then
 						orbitSpeed = 25
 					end
 				else
@@ -1443,6 +1443,13 @@ RunService.RenderStepped:Connect(function(dt)
 				end
 			end
 		end)
+		if orbitRadius >= 1200 and AutoLoadMap == true then
+			AutoLoadMap = false
+			for i=1,5 do
+				wait()
+				HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,7,0)
+			end
+		end
 	end
 end)
 
@@ -1452,9 +1459,7 @@ task.spawn(function()
 	local Foliage = Map:WaitForChild("Foliage")
 	while wait(1) do
 		if AutoCutTree == true and Foliage then
-			if character:FindFirstChild("ToolHandle") then
-				--UnEquip()
-			else
+			if not character:FindFirstChild("ToolHandle") then
 				EquipAxe()
 			end
 			for _, item in ipairs(Foliage:GetChildren()) do
