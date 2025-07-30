@@ -1,3 +1,9 @@
+if tonumber(game.PlaceId) == 79546208627805 then
+	for i=1,4 do
+		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "⚠️ รันในเกม",Text = "ไม่สามารถรันในล็อบบี้ได้",Duration = 3})
+		wait(2.7)
+	end
+end
 TweenService = game:GetService("TweenService");RunService = game:GetService("RunService")
 Lighting = game:GetService("Lighting");replicatedStorage = game:GetService("ReplicatedStorage")
 UIS = game:GetService("UserInputService");player = game.Players.LocalPlayer
@@ -14,6 +20,7 @@ RequestStartDraggingItem = RemoteEvents:FindFirstChild("RequestStartDraggingItem
 StopDraggingItem = RemoteEvents:FindFirstChild("StopDraggingItem");UnequipItemHandle = RemoteEvents:WaitForChild("UnequipItemHandle")
 EquipItemHandle = RemoteEvents:FindFirstChild("EquipItemHandle");ToolDamageObject = RemoteEvents:WaitForChild("ToolDamageObject")
 RequestHotbarItem = RemoteEvents:FindFirstChild("RequestHotbarItem");RequestConsumeItem = RemoteEvents:FindFirstChild("RequestConsumeItem")
+Foliage = Map:WaitForChild("Foliage")
 PlayerAxe = nil ;Auto_FOOD = false ;DontEquipTool = false
 local function EquipAxe()
 	local AxeFound = nil
@@ -242,7 +249,7 @@ gradient_IconLoad = Instance.new("UIGradient", LoadingIcon); gradient_IconLoad.R
 LoadingFrame.ZIndex = 2;LoadingBar1.ZIndex = 3;LoadingBar2.ZIndex = 4;LoadingText.ZIndex = 3;LoadingIcon.ZIndex = 3; gradient_IconLoad.Offset = Vector2.new(0, -1.5)
 IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.6f")
+VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.7")
 FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -364,6 +371,8 @@ ModeTeleport, ModeTeleport_SelectFuntion = Create_ModeButton(" เทเลพ�
 ModeDrag, ModeDrag_SelectFuntion = Create_ModeButton(" ดึงของ / ย้าย 📦 ")
 
 ModeAuto, ModeAuto_SelectFuntion = Create_ModeButton(" อัตโนมัติ ⚡ ")
+
+ModeMore, ModeMore_SelectFuntion = Create_ModeButton(" เพิ่มเติม ➕ ")
 
 ---- End!!
 local function Create_Line(Parent, Name)
@@ -552,9 +561,9 @@ local function matchesAllowedKeyword(value, allowedKeywords)
 	return false
 end
 ---------------- **** ModePlayer_SelectFuntion ****
-ModePlayer1 = Create_Line(ModePlayer_SelectFuntion, "การเคลื่อนไหว") ;moveDirection = humanoid.MoveDirection
-WalkSpeed = 16 ;Defalse_WalkSpeed = 16
-PlayerSpeed_SlideBar, PlayerSpeed_Bar, PlayerSpeed_TextBox, PlayerSpeed_ShowValue, PlayerSpeed_Color, PlayerSpeed_ResetButton = Create_Slide_Textbox(ModePlayer_SelectFuntion, "ความเร็วการเดิน", "ใส่ค่าที่ต้องการเลยครับ", WalkSpeed)
+local ModePlayer1 = Create_Line(ModePlayer_SelectFuntion, "การเคลื่อนไหว")
+local WalkSpeed = 16 ; local Defalse_WalkSpeed = 16
+local PlayerSpeed_SlideBar, PlayerSpeed_Bar, PlayerSpeed_TextBox, PlayerSpeed_ShowValue, PlayerSpeed_Color, PlayerSpeed_ResetButton = Create_Slide_Textbox(ModePlayer_SelectFuntion, "ความเร็วการเดิน", "ใส่ค่าที่ต้องการเลยครับ", WalkSpeed)
 local function SetSlider(Bar, Slide, Defalse_Value, Color)
 	local slider_WalkSpeed = createSlider(Bar, Slide, function(value)
 		WalkSpeed = value
@@ -579,9 +588,10 @@ local function SetSlider(Bar, Slide, Defalse_Value, Color)
 		local Set_Stop = false
 		while wait(0.05) do
 			PlayerSpeed_ShowValue.Text = WalkSpeed--humanoid.WalkSpeed = WalkSpeed
+			local moveDirection = humanoid.MoveDirection
 			if moveDirection.Magnitude > 0 and tonumber(PlayerSpeed_ShowValue.Text) ~= Defalse_Value then
-				local Set_Stop = true
-				local velocity = moveDirection.Unit * (WalkSpeed * 1.5)
+				Set_Stop = true
+				local velocity = moveDirection.Unit * WalkSpeed
 				HMNRT.AssemblyLinearVelocity = Vector3.new(velocity.X, HMNRT.AssemblyLinearVelocity.Y, velocity.Z)
 			else
 				if Set_Stop == true then
@@ -598,7 +608,6 @@ local function SetSlider(Bar, Slide, Defalse_Value, Color)
 	end)
 end
 SetSlider(PlayerSpeed_SlideBar, PlayerSpeed_Bar, Defalse_WalkSpeed, PlayerSpeed_Color)
-
 local function convertJumpHeightToPower(jumpHeight)
 	local gravity = workspace.Gravity
 	return math.sqrt(2 * gravity * jumpHeight)
@@ -755,7 +764,7 @@ local Brightness = false;Brightness_Button.Activated:Connect(function()
 end)
 ---------------- **** ModeFarm_SelectFuntion **** ----------------
 local ModeDragLine_1 = Create_Line(ModeFarm_SelectFuntion, "ฟาร์ม 🌾")
-local AutoCutTree_Button = Create_Toggle(ModeFarm_SelectFuntion, "ออโต้ตัดไม้")
+AutoCutTree_Button = Create_Toggle(ModeFarm_SelectFuntion, "ออโต้ตัดไม้")
 local AutoCutTree = false;AutoCutTree_Button.Activated:Connect(function()
 	if AutoCutTree == false then
 		humanoid.HipHeight = 60
@@ -766,11 +775,10 @@ local AutoCutTree = false;AutoCutTree_Button.Activated:Connect(function()
 		AutoCutTree = false
 		DontEquipTool = false
 		HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,7,0)
-		--UnEquip()
 	end
 end)
 local KillAura = false ; local OnTopEnameis = false
-local AutoCook_Button = Create_Toggle(ModeFarm_SelectFuntion, "ออโต้ทำอาหาร")
+AutoCook_Button = Create_Toggle(ModeFarm_SelectFuntion, "ออโต้ทำอาหาร")
 local AutoCook = false;AutoCook_Button.Activated:Connect(function()
 	if AutoCook == false then
 		AutoCook = true
@@ -786,7 +794,9 @@ local AutoCook = false;AutoCook_Button.Activated:Connect(function()
 		DontEquipTool = false
 	end	
 end)
+
 local ModeDragLine_2 = Create_Line(ModeFarm_SelectFuntion, "ต่อสู้ 🗡️")
+
 local KillAura_Button = Create_Toggle(ModeFarm_SelectFuntion, "คิลออร่า")
 local KillAura = false;KillAura_Button.Activated:Connect(function()
 	if KillAura == false then
@@ -795,14 +805,41 @@ local KillAura = false;KillAura_Button.Activated:Connect(function()
 		KillAura = false
 	end	
 end)
-local FastProxLootBox_Button = Create_Toggle(ModeFarm_SelectFuntion, "เปิดกล่องไว")
-local FastProxLootBox = false;FastProxLootBox_Button.Activated:Connect(function()
-	if FastProxLootBox == false then
-		FastProxLootBox = true
-	else
-		FastProxLootBox = false
-	end	
-end)
+
+local Kill_Aura_Dis = 100 ; local Max_Kill_Aura_Dis = 200
+local Kill_Aura_SlideBar, Kill_Aura_Bar, Kill_Aura_TextBox, Kill_Aura_ShowValue, Kill_Aura_Color, Kill_Aura_ResetButton = Create_Slide_Textbox(ModeFarm_SelectFuntion, "ระยะการคิลออร่า", "ใส่ค่าที่ต้องการเลยครับ", Kill_Aura_Dis)
+local function SetSlider5(Bar, Slide, Defalse_Value, Color)
+	local slider_Kill_Aura = createSlider(Bar, Slide, function(value)
+		Kill_Aura_Dis = value;	Kill_Aura_TextBox.Text = ""
+	end, 200)
+	slider_Kill_Aura.SetValue(Kill_Aura_Dis)
+	Kill_Aura_TextBox.FocusLost:Connect(function(enterPressed)
+		local text = Kill_Aura_TextBox.Text
+		local number = tonumber(text)
+		if number then
+			Kill_Aura_Dis = number
+			slider_Kill_Aura.SetValue(number)
+		else
+			Kill_Aura_TextBox.Text = ""
+		end
+	end)
+	Kill_Aura_ResetButton.Activated:Connect(function()
+		Kill_Aura_Dis = 1
+		slider_Kill_Aura.SetValue(1)
+	end)
+	task.spawn(function()
+		while wait(0.3) do
+			Kill_Aura_ShowValue.Text = Kill_Aura_Dis
+			if tonumber(Kill_Aura_ShowValue.Text) == Max_Kill_Aura_Dis then
+				tweenButtonColor(Color, Color3.new(0.145098, 0.133333, 0.392157), 0.17)
+			else
+				tweenButtonColor(Color, Color3.new(0.45098, 0, 1), 0.17)
+			end
+		end
+	end)
+end
+SetSlider5(Kill_Aura_SlideBar, Kill_Aura_Bar, Kill_Aura_Dis, Kill_Aura_Color)
+
 ---------------- **** ModeDrag_SelectFuntion **** ----------------
 
 local Target = "Character"
@@ -832,6 +869,39 @@ local FastBring = false;FastBring_Button.Activated:Connect(function()
 		FastBring = true
 	end
 end)
+local Bring_Count = 100 ; local Max_Bring_Count = 100
+local Bring_Count_SlideBar, Bring_Count_Bar, Bring_Count_TextBox, Bring_Count_ShowValue, Bring_Count_Color, Bring_Count_ResetButton = Create_Slide_Textbox(ModeDrag_SelectFuntion, "จำนวนที่ต้องการดึง", "ใส่ค่าที่ต้องการเลยครับ", Bring_Count)
+local function SetSlider4(Bar, Slide, Defalse_Value, Color)
+	local slider_Bring_Count = createSlider(Bar, Slide, function(value)
+		Bring_Count = value;	Bring_Count_TextBox.Text = ""
+	end, 100)
+	slider_Bring_Count.SetValue(Bring_Count)
+	Bring_Count_TextBox.FocusLost:Connect(function(enterPressed)
+		local text = Bring_Count_TextBox.Text
+		local number = tonumber(text)
+		if number then
+			Bring_Count = number
+			slider_Bring_Count.SetValue(number)
+		else
+			Bring_Count_TextBox.Text = ""
+		end
+	end)
+	Bring_Count_ResetButton.Activated:Connect(function()
+		Bring_Count = 1
+		slider_Bring_Count.SetValue(1)
+	end)
+	task.spawn(function()
+		while wait(0.1) do
+			Bring_Count_ShowValue.Text = Bring_Count
+			if tonumber(Bring_Count_ShowValue.Text) == Max_Bring_Count then
+				tweenButtonColor(Color, Color3.new(0.145098, 0.133333, 0.392157), 0.17)
+			else
+				tweenButtonColor(Color, Color3.new(0.45098, 0, 1), 0.17)
+			end
+		end
+	end)
+end
+SetSlider4(Bring_Count_SlideBar, Bring_Count_Bar, Bring_Count, Bring_Count_Color)
 local function BringItemWithItem2(item2)
 	pcall(function()
 		if item2.Name == "Berry" then
@@ -845,7 +915,7 @@ local function BringItemWithItem2(item2)
 		if Target == "Character" then
 			RequestStartDraggingItem:FireServer(item2)
 			wait(0.03)
-			item2.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(math.random(-3,3),math.random(-3,3),-2)
+			item2.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(math.random(-3,3),2,-3 + math.random(-3,3))
 		elseif Target == "Craft" then
 			RequestStartDraggingItem:FireServer(item2)
 			wait(0.03)
@@ -853,7 +923,7 @@ local function BringItemWithItem2(item2)
 		elseif Target == "NearCamp" then
 			RequestStartDraggingItem:FireServer(item2)
 			wait(0.03)
-			item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(-15,0,0)
+			item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(-20,2,0)
 		elseif Target == "Fire" then
 			RequestStartDraggingItem:FireServer(item2)
 			wait(0.03)
@@ -863,7 +933,7 @@ local function BringItemWithItem2(item2)
 		StopDraggingItem:FireServer(item2)
 	end)
 end
-local Item_Fuel_Teble = {"Chair", "Coal", "Fuel Canister", "Log", "Oil Barrel"}
+local Item_Fuel_Teble = {"Sapling", "Chair", "Coal", "Fuel Canister", "Log", "Oil Barrel"}
 local Item_Weapon_Teble = {"Bandage", "Iron Body", "Leather Body", "MedKit", "Revolver", "Revolver Ammo", "Rifle", "Rifle Ammo", "Strong Axe", "Laser Sword", "Raygun"}
 local Item_Food_Teble = {"Apple", "Berry", "Cake", "Carrot", "Meat? Sandwich"}
 local Item_Scrap_Teble = {"Broken Microwave", "Metal Chair", "Old Car Engine", "Old Radio", "Sheet Metal", "Tyre", "UFO Junk", "UFO Scrap", "Washing Machine"}
@@ -888,9 +958,13 @@ Bring_Food_Button.Activated:Connect(function()
 	for _, item2 in ipairs(Drop_Food_Item_List:GetChildren()) do
 		if item2:IsA("RayValue") then
 			local TargetName = item2.Name
+			local Bring_Count_Work = 0
 			for _, item2 in ipairs(Items:GetChildren()) do
 				if item2.Name == TargetName and item2.PrimaryPart then
-					BringItemWithItem2(item2)
+					if Bring_Count_Work < Bring_Count then
+						BringItemWithItem2(item2)
+						Bring_Count_Work = Bring_Count_Work + 1
+					end
 				end
 				if FastBring == false then
 					wait()
@@ -917,15 +991,19 @@ for _, Item_In_Game in ipairs(Item_Fuel_Teble) do
 	wait()
 end
 local Bring_Fuel_Button, Bring_Fuel_Button_Text = Create_Click(ModeDrag_SelectFuntion, "ดึงเชื้อเพลิงที่เลือก")
-Bring_Fuel_Button.Activated:Connect(function()	
+Bring_Fuel_Button.Activated:Connect(function()
 	Bring_Fuel_Button_Text.Text = "กำลังดึงเชื้อเพลิงที่เลือก"
 	Bring_Fuel_Button.Active = false
 	for _, item2 in ipairs(Drop_Fuel_Item_List:GetChildren()) do
 		if item2:IsA("RayValue") then
 			local TargetName = item2.Name
+			local Bring_Count_Work = 0
 			for _, item2 in ipairs(Items:GetChildren()) do
 				if item2.Name == TargetName and item2.PrimaryPart then
-					BringItemWithItem2(item2)
+					if Bring_Count_Work < Bring_Count then
+						BringItemWithItem2(item2)
+						Bring_Count_Work = Bring_Count_Work + 1
+					end
 				end
 				if FastBring == false then
 					wait()
@@ -958,9 +1036,13 @@ Bring_Scrap_Button.Activated:Connect(function()
 	for _, item2 in ipairs(Drop_Scrap_Item_List:GetChildren()) do
 		if item2:IsA("RayValue") then
 			local TargetName = item2.Name
+			local Bring_Count_Work = 0
 			for _, item2 in ipairs(Items:GetChildren()) do
 				if item2.Name == TargetName and item2.PrimaryPart then
-					BringItemWithItem2(item2)
+					if Bring_Count_Work < Bring_Count then
+						BringItemWithItem2(item2)
+						Bring_Count_Work = Bring_Count_Work + 1
+					end
 				end
 				if FastBring == false then
 					wait()
@@ -993,9 +1075,13 @@ Bring_Weapon_Button.Activated:Connect(function()
 	for _, item2 in ipairs(Drop_Weapon_Item_List:GetChildren()) do
 		if item2:IsA("RayValue") then
 			local TargetName = item2.Name
+			local Bring_Count_Work = 0
 			for _, item2 in ipairs(Items:GetChildren()) do
 				if item2.Name == TargetName and item2.PrimaryPart then
-					BringItemWithItem2(item2)
+					if Bring_Count_Work < Bring_Count then
+						BringItemWithItem2(item2)
+						Bring_Count_Work = Bring_Count_Work + 1
+					end
 				end
 				if FastBring == false then
 					wait()
@@ -1020,9 +1106,13 @@ local function ResetAllItemInServer()
 		if not ModeDrag_SelectFuntion:FindFirstChild("Reset_"..item.Name) then
 			local NewBring_Button = Create_Click(ModeDrag_SelectFuntion, item.Name, "Reset_")
 			NewBring_Button.Activated:Connect(function()
+				local Bring_Count_Work = 0
 				for _, item2 in ipairs(Items:GetChildren()) do
 					if item2.Name == item.Name and item2.PrimaryPart then
-						BringItemWithItem2(item2)
+						if Bring_Count_Work < Bring_Count then
+							BringItemWithItem2(item2)
+							Bring_Count_Work = Bring_Count_Work + 1
+						end
 					end
 					if FastBring == false then
 						wait()
@@ -1066,13 +1156,8 @@ end)
 
 local SetScriptTp_StrongHold = false; local CheckDaleyStrongHoldTpButton = 1
 local TeleStrongHold_Button, TeleTextMain_Button, TeleMain_Button = Create_Click(ModeTeleport_SelectFuntion, "สตรองโฮลด์ 💎")
-local NotThisNameTele = {"Spawn", "No Respawn", "Bush"
-	, "Burrow", "Portion", "Stack", "Flower", "Hollow"
-	, "Mud", "Grave", "Pillars", "Trap", "Stump"
-	, "Small Tree", "Wide", "Hole", "Well"}
-
-local Landmarks = Map:WaitForChild("Landmarks")
-
+local NotThisNameTele = {"Spawn", "No Respawn", "Bush", "Burrow", "Portion", "Stack", "Flower", "Hollow", "Mud", "Grave", "Pillars", "Trap", "Stump", "Small Tree", "Wide", "Hole", "Well"}
+Landmarks = Map:WaitForChild("Landmarks")
 local function ResetAllStucInServer()
 	for _, item in ipairs(ModeTeleport_SelectFuntion:GetChildren()) do
 		if item:IsA("Frame") and matchesAllowedKeyword(item.Name, {"Reset_"}) then
@@ -1103,8 +1188,7 @@ end)
 
 ---------------- **** ModeAuto_SelectFuntion **** ----------------
 
-local ModeAutoLine_1 = Create_Line(ModeAuto_SelectFuntion, "สถานะ 📝")
-
+ModeAutoLine_1 = Create_Line(ModeAuto_SelectFuntion, "สถานะ 📝")
 local AutoFillHunger = false
 local Custom_Food = false
 local Auto_Food_Teble = {"Apple", "Carrot", "Cake", "Berry", "Cooked Morsel", "Cooked Steak"}
@@ -1130,9 +1214,7 @@ AutoFillHunger_Button.Activated:Connect(function()
 		AutoFillHunger = false
 	end	
 end)
-
-local ModeAutoLine_1 = Create_Line(ModeAuto_SelectFuntion, "ออโต้หา 🔎")
-
+ModeAutoLine_1 = Create_Line(ModeAuto_SelectFuntion, "ออโต้หา 🔎")
 local AutoGetKid_Button = Create_Toggle(ModeAuto_SelectFuntion, "ออโต้หาเด็ก")
 local AutoGetKid = false;AutoGetKid_Button.Activated:Connect(function()
 	if AutoGetKid == false then
@@ -1178,14 +1260,192 @@ RunService.RenderStepped:Connect(function(dt)
 			end
 		end)
 		if orbitRadius >= 1200 and AutoLoadMap == true then
-			AutoLoadMap = false
 			for i=1,5 do
 				wait()
 				HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,7,0)
 			end
+			repeat
+				wait(0.1)
+			until AutoLoadMap == false
 		end
 	end
 end)
+
+AutoPickGoldCoin_Button = Create_Toggle(ModeFarm_SelectFuntion, "ออโต้เก็บเหรียญทอง 💰 ")
+local AutoPickGoldCoin = false;AutoPickGoldCoin_Button.Activated:Connect(function()
+	if AutoPickGoldCoin == false then
+		AutoPickGoldCoin = true
+	else
+		AutoPickGoldCoin = false
+	end
+end)
+AutoPickFlower_Button = Create_Toggle(ModeFarm_SelectFuntion, "ออโต้เก็บดอกไม้ 💐 ")
+local AutoPickFlower = false;AutoPickFlower_Button.Activated:Connect(function()
+	if AutoPickFlower == false then
+		AutoPickFlower = true
+	else
+		AutoPickFlower = false
+	end
+end)
+task.spawn(function()
+	local RequestCollectCoints = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("RequestCollectCoints")
+	local RequestPickFlower = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("RequestPickFlower")
+	while wait(5) do
+		if AutoPickGoldCoin == true then
+			for _, item2 in ipairs(Items:GetChildren()) do
+				if item2.Name == "Coin Stack" then
+					RequestCollectCoints:InvokeServer(item2)
+				end
+				wait()
+			end
+		end
+		if AutoPickFlower == true then
+			for _, item3 in ipairs(Landmarks:GetChildren()) do
+				if item3.Name == "Flower" then
+					RequestPickFlower:InvokeServer(item3)
+				end
+				wait()
+			end
+		end
+	end
+end)
+
+---------------- **** ModeMore_SelectFuntion **** ----------------
+
+local FastProxLootBox_Button = Create_Toggle(ModeMore_SelectFuntion, "เปิดกล่องไว")
+local FastProxLootBox = false;FastProxLootBox_Button.Activated:Connect(function()
+	if FastProxLootBox == false then
+		FastProxLootBox = true
+	else
+		FastProxLootBox = false
+	end	
+end)
+
+ModeMoreLine_1 = Create_Line(ModeMore_SelectFuntion, "การมองเห็น 👁️")
+
+EspChest_Button = Create_Toggle(ModeMore_SelectFuntion, "มองทะลุหีบ")
+local EspChest = false;EspChest_Button.Activated:Connect(function()
+	if EspChest == false then
+		EspChest = true
+	else
+		EspChest = false
+		for _, item2 in ipairs(Items:GetChildren()) do
+			if item2 and matchesAllowedKeyword(item2.Name, {"Chest"}) and item2:IsA("Model") then
+				if item2:FindFirstChild("SOmtankChestESP") then
+					item2:FindFirstChild("SOmtankChestESP"):Destroy()
+				end
+				if item2:FindFirstChild("SOmtankChestBil") then
+					item2:FindFirstChild("SOmtankChestBil"):Destroy()
+				end
+			end
+			wait()
+		end
+	end	
+end)
+task.spawn(function()
+	while wait(6) do
+		if EspChest == true then
+			for _, item2 in ipairs(Items:GetChildren()) do
+				if item2 and matchesAllowedKeyword(item2.Name, {"Chest"}) and item2:IsA("Model") then
+					if not item2:FindFirstChild("SOmtankChestESP") then
+						local NewHi = Instance.new("Highlight", item2)
+						local NewBil = Instance.new("BillboardGui", item2)
+						local NewText = Instance.new("TextLabel", NewBil)
+						NewHi.Name = "SOmtankChestESP"
+						NewBil.Name = "SOmtankChestBil"
+						NewHi.OutlineTransparency = 1
+						NewHi.FillColor = Color3.new(0.407843, 0.352941, 1)
+						NewText.BackgroundTransparency = 1
+						NewText.TextColor3 = Color3.new(0.415686, 0.184314, 1)
+						NewText.Text = "Chest"
+						NewBil.Size = UDim2.new(0, 200,0, 50)
+						NewBil.SizeOffset = Vector2.new(0, 0.5)
+						NewBil.AlwaysOnTop = true
+						NewText.Size = UDim2.new(0, 200,0, 50)
+						NewText.TextYAlignment = Enum.TextYAlignment.Top
+						NewText.TextSize = 26
+						NewText.Font = Enum.Font.Highway
+						pcall(function()
+							repeat
+								wait(0.01)
+							until item2.PrimaryPart.ProximityAttachment.ProximityInteraction
+							local Prox = item2.PrimaryPart.ProximityAttachment.ProximityInteraction
+							Prox.Triggered:Connect(function()
+								if item2:FindFirstChild("SOmtankChestBil") and item2:FindFirstChild("SOmtankChestBil"):FindFirstChild("TextLabel") then
+									item2:FindFirstChild("SOmtankChestBil"):FindFirstChild("TextLabel").Text = "Chest - Opened"
+								end
+							end)
+						end)
+					end
+				end
+				wait()
+			end
+		end	
+	end
+end)
+
+ModeMoreLine_2 = Create_Line(ModeMore_SelectFuntion, "ช่วยลดความแล็ค 🏞️")
+
+NoLeaf_Button = Create_Toggle(ModeMore_SelectFuntion, "ลบสิ่งไม่ไม่จำเป็น 🍃")
+local NoLeaf = false;NoLeaf_Button.Activated:Connect(function()
+	if NoLeaf == false then
+		NoLeaf = true
+	else
+		NoLeaf = false
+	end	
+end)
+task.spawn(function()
+	local function SoftDestroyLeaf(Model)
+		if Model then
+			for _, item in ipairs(Model:GetChildren()) do
+				if item:IsA("BasePart") and item.Material == Enum.Material.Grass then
+					item:Destroy()
+				end						
+			end
+		end
+	end
+	while wait(10) do
+		if NoLeaf == true then
+			for _, item in ipairs(Map.Ground:GetChildren()) do
+				if item:IsA("BasePart") and item.Material == Enum.Material.Grass then
+					item.Material = Enum.Material.SmoothPlastic
+					item.CastShadow = false
+				end	
+				wait()
+			end
+			for _, item in ipairs(Foliage:GetChildren()) do
+				pcall(function()
+					if NoLeaf == true then
+						if item.Name == "Bush" then
+							item:Destroy()
+						elseif item.Name == "StoneTall" or item.Name == "StoneSmall" then
+							item:Destroy()
+						elseif item.Name == "Grass1" or item.Name == "Grass2" then
+							item:Destroy()
+						elseif item.Name == "Small Tree" then
+							SoftDestroyLeaf(item)
+						elseif item.Name == "TreeBig1" or item.Name == "TreeBig2" or item.Name == "TreeBig3" then
+							SoftDestroyLeaf(item)
+						end
+					end
+				end)
+				wait()
+			end
+			for _, item in ipairs(Landmarks:GetChildren()) do
+				pcall(function()
+					if NoLeaf == true then
+						if item.Name == "Small Tree" then
+							SoftDestroyLeaf(item)
+						end
+					end
+				end)
+				wait()
+			end	
+		end	
+	end
+end)
+
+
 ------******* End *******-------
 Close_Panal.Activated:Connect(function()
 	local ByeSound = Instance.new("Sound", game.SoundService)
@@ -1205,7 +1465,6 @@ Close_Panal.Activated:Connect(function()
 end)
 ------- ***** Start Script Loop ***** ----------------
 task.spawn(function()
-	local Foliage = Map:WaitForChild("Foliage")
 	while wait(1) do
 		if AutoCutTree == true and Foliage then
 			if not character:FindFirstChild("ToolHandle") then
@@ -1215,7 +1474,7 @@ task.spawn(function()
 				if item.Name == "Small Tree" and item.PrimaryPart and AutoCutTree == true then
 					pcall(function()
 						HMNRT.CFrame = item.PrimaryPart.CFrame * CFrame.new(math.random(-5,5),67,math.random(-5,5))
-						if PlayerAxe then
+						if PlayerAxe and ToolDamageObject then
 							local CutTree_args = {item,PlayerAxe,"99_98989899",
 								CFrame.new(HMNRT.Position.X, HMNRT.Position.Y, HMNRT.Position.Z, 0.5035070776939392, 0.470787912607193, -0.7244579792022705, 0.000007343664492509561, 0.8384993076324463, 0.5449026226997375, 0.8639910817146301, -0.27436766028404236, 0.4221869111061096)}
 							repeat
@@ -1224,7 +1483,7 @@ task.spawn(function()
 								end
 								ToolDamageObject:InvokeServer(unpack(CutTree_args))
 								wait(0.3)
-							until item == nil or item:GetAttribute("Health") < 5
+							until item == nil or item:GetAttribute("Health") < 5 or AutoCutTree == false
 							for i=1,3 do
 								if item and AutoCutTree == true then
 									HMNRT.CFrame = item.PrimaryPart.CFrame * CFrame.new(math.random(-5,5),67,math.random(-5,5))
@@ -1286,10 +1545,16 @@ task.spawn(function()
 	end
 end)
 task.spawn(function()
-	while wait(0.5) do
+	while wait(1) do
 		if Nofog == true then
 			Lighting.FogEnd = 5000
 			Lighting.FogStart = 5000
+			for _, item in ipairs(Map.Boundaries:GetChildren()) do
+				if item:IsA("BasePart") and item.Name == "Part" then
+					item:Destroy()
+				end
+				wait()
+			end
 		end
 		if Brightness == true then
 			Lighting.Brightness = 10
@@ -1326,7 +1591,7 @@ task.spawn(function()
 			for _, obj in pairs(workspace.Characters:GetChildren()) do
 				if obj:IsA("Model") and obj:FindFirstChild("NPC") and obj:FindFirstChild("HumanoidRootPart") then
 					local dist = (obj.HumanoidRootPart.Position - HMNRT.Position).Magnitude
-					if dist < nearestDistance and KillAura == true then
+					if dist <= Kill_Aura_Dis and dist < nearestDistance and KillAura == true then
 						nearestDistance = dist
 						nearest = obj
 					end
@@ -1347,7 +1612,7 @@ task.spawn(function()
 	end
 end)
 task.spawn(function()
-	while wait(1) do
+	while wait(3) do
 		if FastProxLootBox == true then
 			for _, item2 in ipairs(Items:GetChildren()) do
 				if item2 and matchesAllowedKeyword(item2.Name, {"Chest"}) and item2.PrimaryPart then
@@ -1357,6 +1622,7 @@ task.spawn(function()
 						until item2.PrimaryPart.ProximityAttachment.ProximityInteraction
 						local Prox = item2.PrimaryPart.ProximityAttachment.ProximityInteraction
 						Prox.HoldDuration = 0
+						Prox.MaxActivationDistance = 50
 					end)
 				end
 			end
