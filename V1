@@ -249,7 +249,7 @@ gradient_IconLoad = Instance.new("UIGradient", LoadingIcon); gradient_IconLoad.R
 LoadingFrame.ZIndex = 2;LoadingBar1.ZIndex = 3;LoadingBar2.ZIndex = 4;LoadingText.ZIndex = 3;LoadingIcon.ZIndex = 3; gradient_IconLoad.Offset = Vector2.new(0, -1.5)
 IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.7u")
+VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.8")
 FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -860,13 +860,16 @@ local TarFire_Button = Create_Click(ModeDrag_SelectFuntion, "กองไฟ")
 TarFire_Button.Activated:Connect(function()
 	Target = "Fire"
 end)
+local FastBring_Delay = 0.12
 local ModeDragLine_N1 = Create_Line(ModeDrag_SelectFuntion, "เพิ่มเติม ⚙️")
 local FastBring_Button = Create_Toggle(ModeDrag_SelectFuntion, "ดึงแบบเร็ว")
 local FastBring = false;FastBring_Button.Activated:Connect(function()
 	if FastBring == true then
 		FastBring = false
+		FastBring_Delay = 0.12
 	else
 		FastBring = true
+		FastBring_Delay = 0.06
 	end
 end)
 local Bring_Count = 100 ; local Max_Bring_Count = 100
@@ -907,33 +910,34 @@ local function BringItemWithItem2(item2)
 	pcall(function()
 		OldCFrame_Bring = HMNRT.CFrame
 		HMNRT.CFrame = item2.PrimaryPart.CFrame
-		wait(0.03)
+		wait(FastBring_Delay)
 		if item2.Name == "Berry" then
 			for i=1,5 do
 				pcall(function()
 					RequestStartDraggingItem:FireServer(item2)
-					wait(0.05)
+					wait(FastBring_Delay)
 				end)
 			end
 		else
 			RequestStartDraggingItem:FireServer(item2)
 		end
 		if Target == "Character" then
-			wait(0.03)
+			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(math.random(-3,3),2,-3 + math.random(-3,3))
 		elseif Target == "Craft" then
-			wait(0.03)
+			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = DashedLine.CFrame * CFrame.new(0,7,0)
 		elseif Target == "NearCamp" then
-			wait(0.03)
+			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(-20,2,0)
 		elseif Target == "Fire" then
-			wait(0.03)
+			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(0,15,0)
 		end
 		HMNRT.CFrame = OldCFrame_Bring
-		wait(0.03)
+		wait(FastBring_Delay)
 		StopDraggingItem:FireServer(item2)
+		wait(FastBring_Delay)
 	end)
 end
 local Item_Fuel_Teble = {"Sapling", "Chair", "Coal", "Fuel Canister", "Log", "Oil Barrel"}
@@ -973,6 +977,7 @@ Bring_Food_Button.Activated:Connect(function()
 					wait()
 				end
 			end
+			HMNRT.CFrame = OldCFrame_Bring
 		end
 	end
 	Bring_Food_Button_Text.Text = "ดึงอาหารที่เลือก"
@@ -1011,6 +1016,7 @@ Bring_Fuel_Button.Activated:Connect(function()
 				if FastBring == false then
 					wait()
 				end
+				HMNRT.CFrame = OldCFrame_Bring
 			end
 		end
 	end
@@ -1050,6 +1056,7 @@ Bring_Scrap_Button.Activated:Connect(function()
 				if FastBring == false then
 					wait()
 				end
+				HMNRT.CFrame = OldCFrame_Bring
 			end
 		end
 	end
@@ -1089,6 +1096,7 @@ Bring_Weapon_Button.Activated:Connect(function()
 				if FastBring == false then
 					wait()
 				end
+				HMNRT.CFrame = OldCFrame_Bring
 			end
 		end
 	end
@@ -1120,6 +1128,7 @@ local function ResetAllItemInServer()
 					if FastBring == false then
 						wait()
 					end
+					HMNRT.CFrame = OldCFrame_Bring
 				end
 			end)
 		end
