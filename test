@@ -870,7 +870,7 @@ local FastBring = false;FastBring_Button.Activated:Connect(function()
 		FastBring_Delay = 0.12
 	else
 		FastBring = true
-		FastBring_Delay = 0.06
+		FastBring_Delay = 0.07
 	end
 end)
 local Bring_Count = 100 ; local Max_Bring_Count = 100
@@ -911,6 +911,8 @@ local function BringItemWithItem2(item2)
 	pcall(function()
 		HMNRT.CFrame = item2.PrimaryPart.CFrame
 		wait(FastBring_Delay)
+		HMNRT.CFrame = item2.PrimaryPart.CFrame
+		wait(FastBring_Delay)
 		if item2.Name == "Berry" then
 			for i=1,5 do
 				pcall(function()
@@ -937,6 +939,7 @@ local function BringItemWithItem2(item2)
 		HMNRT.CFrame = OldCFrame_Bring
 		wait(FastBring_Delay)
 		StopDraggingItem:FireServer(item2)
+		HMNRT.CFrame = OldCFrame_Bring
 		wait(FastBring_Delay)
 		StopDraggingItem:FireServer(item2)
 	end)
@@ -1203,6 +1206,9 @@ end
 ModeTeleport.Activated:Connect(function()
 	ResetAllStucInServer()
 end)
+
+
+--workspace.Map.Landmarks["Snow Clothing Shop"].Main
 
 ---------------- **** ModeAuto_SelectFuntion **** ----------------
 
