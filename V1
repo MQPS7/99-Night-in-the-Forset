@@ -250,7 +250,7 @@ gradient_IconLoad = Instance.new("UIGradient", LoadingIcon); gradient_IconLoad.R
 LoadingFrame.ZIndex = 2;LoadingBar1.ZIndex = 3;LoadingBar2.ZIndex = 4;LoadingText.ZIndex = 3;LoadingIcon.ZIndex = 3; gradient_IconLoad.Offset = Vector2.new(0, -1.5)
 IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.8g")
+VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.9")
 FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -873,7 +873,7 @@ local FastBring = false;FastBring_Button.Activated:Connect(function()
 		FastBring_Delay = 0.07
 	end
 end)
-local Bring_Count = 10 ; local Max_Bring_Count = 100
+Bring_Count = 10 ;Max_Bring_Count = 100
 local Bring_Count_SlideBar, Bring_Count_Bar, Bring_Count_TextBox, Bring_Count_ShowValue, Bring_Count_Color, Bring_Count_ResetButton = Create_Slide_Textbox(ModeDrag_SelectFuntion, "จำนวนที่ต้องการดึง", "ใส่ค่าที่ต้องการเลยครับ", Bring_Count)
 local function SetSlider4(Bar, Slide, Defalse_Value, Color)
 	local slider_Bring_Count = createSlider(Bar, Slide, function(value)
@@ -892,7 +892,7 @@ local function SetSlider4(Bar, Slide, Defalse_Value, Color)
 	end)
 	Bring_Count_ResetButton.Activated:Connect(function()
 		Bring_Count = 10
-		slider_Bring_Count.SetValue(1)
+		slider_Bring_Count.SetValue(10)
 	end)
 	task.spawn(function()
 		while wait(0.1) do
@@ -906,18 +906,37 @@ local function SetSlider4(Bar, Slide, Defalse_Value, Color)
 	end)
 end
 SetSlider4(Bring_Count_SlideBar, Bring_Count_Bar, Bring_Count, Bring_Count_Color)
+-- เพิ่มตัวแปรสำหรับควบคุมการหยุด
+local isRunning = {
+	food = false,
+	fuel = false,
+	scrap = false,
+	weapon = false
+}
+
 local OldCFrame_Bring = HMNRT.CFrame
+
 local function BringItemWithItem2(item2)
 	pcall(function()
 		humanoid:MoveTo(item2.PrimaryPart.Position)
 		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),2,math.random(-3,3))
 		wait(FastBring_Delay)
+
+		-- เพิ่มการตรวจสอบว่าควรหยุดหรือไม่
+		if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then
+			return -- หยุดการทำงานทันที
+		end
+
 		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),2,math.random(-3,3))
 		wait(FastBring_Delay)
 		HMNRT.CFrame = item2.PrimaryPart.CFrame
 		wait(FastBring_Delay)
+
 		if item2.Name == "Berry" then
 			for i=1,5 do
+				if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then
+					return -- หยุดการทำงานทันที
+				end
 				pcall(function()
 					RequestStartDraggingItem:FireServer(item2)
 					wait(FastBring_Delay)
@@ -926,6 +945,7 @@ local function BringItemWithItem2(item2)
 		else
 			RequestStartDraggingItem:FireServer(item2)
 		end
+
 		if Target == "Character" then
 			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = OldCFrame_Bring * CFrame.new(math.random(-3,3),2,-3 + math.random(-3,3))
@@ -939,6 +959,7 @@ local function BringItemWithItem2(item2)
 			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(0,15,0)
 		end
+
 		HMNRT.CFrame = OldCFrame_Bring
 		wait(FastBring_Delay)
 		StopDraggingItem:FireServer(item2)
@@ -947,13 +968,64 @@ local function BringItemWithItem2(item2)
 		StopDraggingItem:FireServer(item2)
 	end)
 end
+
+local function CreateStoppableBringFunction(itemType, itemList, button, buttonText, normalText, runningText)
+	button.Activated:Connect(function()
+		if isRunning[itemType] then
+			isRunning[itemType] = false
+			buttonText.Text = normalText
+			button.Active = true
+		else
+			isRunning[itemType] = true
+			buttonText.Text = runningText .. " (กดอีกครั้งเพื่อหยุด)"
+			button.Active = true
+
+			OldCFrame_Bring = HMNRT.CFrame
+
+			spawn(function()
+				for _, item1 in ipairs(itemList:GetChildren()) do
+					if not isRunning[itemType] then break end
+
+					if item1:IsA("RayValue") then
+						local TargetName = item1.Name
+						local Bring_Count_Work = 0
+
+						for _, item2 in ipairs(Items:GetChildren()) do
+							if not isRunning[itemType] then break end
+
+							if item2.Name == TargetName and item2.PrimaryPart then
+								if Bring_Count_Work < Bring_Count then
+									BringItemWithItem2(item2)
+									Bring_Count_Work = Bring_Count_Work + 1
+								end
+							end
+
+							if FastBring == false then
+								wait()
+							end
+						end
+					end
+				end
+
+				HMNRT.CFrame = OldCFrame_Bring
+				isRunning[itemType] = false
+				buttonText.Text = normalText
+				button.Active = true
+			end)
+		end
+	end)
+end
+
 local Item_Fuel_Teble = {"Sapling", "Chair", "Coal", "Fuel Canister", "Log", "Oil Barrel"}
 local Item_Weapon_Teble = {"Bandage", "Iron Body", "Leather Body", "MedKit", "Revolver", "Revolver Ammo", "Rifle", "Rifle Ammo", "Strong Axe", "Laser Sword", "Raygun"}
 local Item_Food_Teble = {"Apple", "Berry", "Cake", "Carrot", "Meat? Sandwich"}
 local Item_Scrap_Teble = {"Broken Microwave", "Metal Chair", "Old Car Engine", "Old Radio", "Sheet Metal", "Tyre", "UFO Junk", "UFO Scrap", "Washing Machine"}
+
+-- ส่วนอาหาร
 local ModeDragLine_2 = Create_Line(ModeDrag_SelectFuntion, "อาหาร 🍇")
 local Drop_Food_Item, Drop_Food_Item_List, ResetButton_Bring_Food_Item = Create_SelectPick(ModeDrag_SelectFuntion, "เลือกไอเท็ม", 5)
 ResetButton_Bring_Food_Item.Visible = false
+
 for _, Item_In_Game in ipairs(Item_Food_Teble) do
 	local NewButton = Create_Toggle_InSC(Drop_Food_Item, Item_In_Game)
 	NewButton.Activated:Connect(function()
@@ -965,36 +1037,14 @@ for _, Item_In_Game in ipairs(Item_Food_Teble) do
 	end)
 	wait()
 end
+
 local Bring_Food_Button, Bring_Food_Button_Text = Create_Click(ModeDrag_SelectFuntion, "ดึงอาหารที่เลือก")
-Bring_Food_Button.Activated:Connect(function()
-	Bring_Food_Button_Text.Text = "กำลังดึงอาหารที่เลือก"
-	Bring_Food_Button.Active = false
-	OldCFrame_Bring = HMNRT.CFrame
-	for _, item1 in ipairs(Drop_Food_Item_List:GetChildren()) do
-		if item1:IsA("RayValue") then
-			local TargetName = item1.Name
-			local Bring_Count_Work = 0
-			for _, item2 in ipairs(Items:GetChildren()) do
-				if item2.Name == TargetName and item2.PrimaryPart then
-					if Bring_Count_Work < Bring_Count then
-						BringItemWithItem2(item2)
-						Bring_Count_Work = Bring_Count_Work + 1
-					end
-				end
-				if FastBring == false then
-					wait()
-				end
-			end
-		end
-	end
-	HMNRT.CFrame = OldCFrame_Bring
-	Bring_Food_Button_Text.Text = "ดึงอาหารที่เลือก"
-	Bring_Food_Button.Active = true
-end)
+CreateStoppableBringFunction("food", Drop_Food_Item_List, Bring_Food_Button, Bring_Food_Button_Text, "ดึงอาหารที่เลือก", "กำลังดึงอาหารที่เลือก")
 
 local ModeDragLine_3 = Create_Line(ModeDrag_SelectFuntion, "เชื้อเพลิง 🔥")
 local Drop_Fuel_Item, Drop_Fuel_Item_List, ResetButton_Bring_Fuel_Item = Create_SelectPick(ModeDrag_SelectFuntion, "เลือกไอเท็ม", 6)
 ResetButton_Bring_Fuel_Item.Visible = false
+
 for _, Item_In_Game in ipairs(Item_Fuel_Teble) do
 	local NewButton = Create_Toggle_InSC(Drop_Fuel_Item, Item_In_Game)
 	NewButton.Activated:Connect(function()
@@ -1006,36 +1056,14 @@ for _, Item_In_Game in ipairs(Item_Fuel_Teble) do
 	end)
 	wait()
 end
+
 local Bring_Fuel_Button, Bring_Fuel_Button_Text = Create_Click(ModeDrag_SelectFuntion, "ดึงเชื้อเพลิงที่เลือก")
-Bring_Fuel_Button.Activated:Connect(function()
-	Bring_Fuel_Button_Text.Text = "กำลังดึงเชื้อเพลิงที่เลือก"
-	Bring_Fuel_Button.Active = false
-	OldCFrame_Bring = HMNRT.CFrame
-	for _, item1 in ipairs(Drop_Fuel_Item_List:GetChildren()) do
-		if item1:IsA("RayValue") then
-			local TargetName = item1.Name
-			local Bring_Count_Work = 0
-			for _, item2 in ipairs(Items:GetChildren()) do
-				if item2.Name == TargetName and item2.PrimaryPart then
-					if Bring_Count_Work < Bring_Count then
-						BringItemWithItem2(item2)
-						Bring_Count_Work = Bring_Count_Work + 1
-					end
-				end
-				if FastBring == false then
-					wait()
-				end
-			end
-		end
-	end
-	HMNRT.CFrame = OldCFrame_Bring
-	Bring_Fuel_Button_Text.Text = "ดึงเชื้อเพลิงที่เลือก"
-	Bring_Fuel_Button.Active = true
-end)
+CreateStoppableBringFunction("fuel", Drop_Fuel_Item_List, Bring_Fuel_Button, Bring_Fuel_Button_Text, "ดึงเชื้อเพลิงที่เลือก", "กำลังดึงเชื้อเพลิงที่เลือก")
 
 local ModeDragLine_4 = Create_Line(ModeDrag_SelectFuntion, "เศษเหล็ก 🧲")
 local Drop_Scrap_Item, Drop_Scrap_Item_List, ResetButton_Bring_Scrap_Item = Create_SelectPick(ModeDrag_SelectFuntion, "เลือกไอเท็ม", 10)
 ResetButton_Bring_Scrap_Item.Visible = false
+
 for _, Item_In_Game in ipairs(Item_Scrap_Teble) do
 	local NewButton = Create_Toggle_InSC(Drop_Scrap_Item, Item_In_Game)
 	NewButton.Activated:Connect(function()
@@ -1047,37 +1075,14 @@ for _, Item_In_Game in ipairs(Item_Scrap_Teble) do
 	end)
 	wait()
 end
+
 local Bring_Scrap_Button, Bring_Scrap_Button_Text = Create_Click(ModeDrag_SelectFuntion, "ดึงเศษเหล็กที่เลือก")
-Bring_Scrap_Button.Activated:Connect(function()	
-	Bring_Scrap_Button_Text.Text = "กำลังดึงเศษเหล็กที่เลือก"
-	Bring_Scrap_Button.Active = false
-	OldCFrame_Bring = HMNRT.CFrame
-	for _, item1 in ipairs(Drop_Scrap_Item_List:GetChildren()) do
-		if item1:IsA("RayValue") then
-			local TargetName = item1.Name
-			local Bring_Count_Work = 0
-			for _, item2 in ipairs(Items:GetChildren()) do
-				if item2.Name == TargetName and item2.PrimaryPart then
-					if Bring_Count_Work < Bring_Count then
-						BringItemWithItem2(item2)
-						Bring_Count_Work = Bring_Count_Work + 1
-					end
-				end
-				if FastBring == false then
-					wait()
-				end
-			end
-		end
-	end
-	HMNRT.CFrame = OldCFrame_Bring
-	Bring_Scrap_Button_Text.Text = "ดึงเศษเหล็กที่เลือก"
-	Bring_Scrap_Button.Active = true
-end)
+CreateStoppableBringFunction("scrap", Drop_Scrap_Item_List, Bring_Scrap_Button, Bring_Scrap_Button_Text, "ดึงเศษเหล็กที่เลือก", "กำลังดึงเศษเหล็กที่เลือก")
 
 local ModeDragLine_5 = Create_Line(ModeDrag_SelectFuntion, "อาวุธ 💣")
-
 local Drop_Weapon_Item, Drop_Weapon_Item_List, ResetButton_Bring_Weapon_Item = Create_SelectPick(ModeDrag_SelectFuntion, "เลือกไอเท็ม", 10)
 ResetButton_Bring_Weapon_Item.Visible = false
+
 for _, Item_In_Game in ipairs(Item_Weapon_Teble) do
 	local NewButton = Create_Toggle_InSC(Drop_Weapon_Item, Item_In_Game)
 	NewButton.Activated:Connect(function()
@@ -1088,32 +1093,9 @@ for _, Item_In_Game in ipairs(Item_Weapon_Teble) do
 		end
 	end)
 end
+
 local Bring_Weapon_Button, Bring_Weapon_Button_Text = Create_Click(ModeDrag_SelectFuntion, "ดึงอาวุธที่เลือก")
-Bring_Weapon_Button.Activated:Connect(function()	
-	Bring_Weapon_Button_Text.Text = "กำลังดึงอาวุธ"
-	Bring_Weapon_Button.Active = false
-	OldCFrame_Bring = HMNRT.CFrame
-	for _, item1 in ipairs(Drop_Weapon_Item_List:GetChildren()) do
-		if item1:IsA("RayValue") then
-			local TargetName = item1.Name
-			local Bring_Count_Work = 0
-			for _, item2 in ipairs(Items:GetChildren()) do
-				if item2.Name == TargetName and item2.PrimaryPart then
-					if Bring_Count_Work < Bring_Count then
-						BringItemWithItem2(item2)
-						Bring_Count_Work = Bring_Count_Work + 1
-					end
-				end
-				if FastBring == false then
-					wait()
-				end
-			end
-		end
-	end
-	HMNRT.CFrame = OldCFrame_Bring
-	Bring_Weapon_Button_Text.Text = "ดึงอาวุธที่เลือก"
-	Bring_Weapon_Button.Active = true
-end)
+CreateStoppableBringFunction("weapon", Drop_Weapon_Item_List, Bring_Weapon_Button, Bring_Weapon_Button_Text, "ดึงอาวุธที่เลือก", "กำลังดึงอาวุธ")
 
 local ModeDragLine_6 = Create_Line(ModeDrag_SelectFuntion, "ไอเท็มที่มีขณะนี้ 📦")
 
