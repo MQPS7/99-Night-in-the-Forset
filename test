@@ -873,7 +873,7 @@ local FastBring = false;FastBring_Button.Activated:Connect(function()
 		FastBring_Delay = 0.07
 	end
 end)
-local Bring_Count = 100 ; local Max_Bring_Count = 100
+local Bring_Count = 10 ; local Max_Bring_Count = 100
 local Bring_Count_SlideBar, Bring_Count_Bar, Bring_Count_TextBox, Bring_Count_ShowValue, Bring_Count_Color, Bring_Count_ResetButton = Create_Slide_Textbox(ModeDrag_SelectFuntion, "จำนวนที่ต้องการดึง", "ใส่ค่าที่ต้องการเลยครับ", Bring_Count)
 local function SetSlider4(Bar, Slide, Defalse_Value, Color)
 	local slider_Bring_Count = createSlider(Bar, Slide, function(value)
@@ -891,7 +891,7 @@ local function SetSlider4(Bar, Slide, Defalse_Value, Color)
 		end
 	end)
 	Bring_Count_ResetButton.Activated:Connect(function()
-		Bring_Count = 1
+		Bring_Count = 10
 		slider_Bring_Count.SetValue(1)
 	end)
 	task.spawn(function()
@@ -909,7 +909,9 @@ SetSlider4(Bring_Count_SlideBar, Bring_Count_Bar, Bring_Count, Bring_Count_Color
 local OldCFrame_Bring = HMNRT.CFrame
 local function BringItemWithItem2(item2)
 	pcall(function()
-		HMNRT.CFrame = item2.PrimaryPart.CFrame
+		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),2,math.random(-3,3))
+		wait(FastBring_Delay)
+		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),2,math.random(-3,3))
 		wait(FastBring_Delay)
 		HMNRT.CFrame = item2.PrimaryPart.CFrame
 		wait(FastBring_Delay)
