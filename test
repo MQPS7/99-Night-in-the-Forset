@@ -915,7 +915,7 @@ local function BringItemWithItem2(item2)
 		if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then return end
 		humanoid.HipHeight = 16
 		
-		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,15,0)
+		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
 		--HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-5,5),5,math.random(-5,5))
 		wait(FastBring_Delay)
 		--HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-5,5),5,math.random(-5,5))
@@ -923,7 +923,7 @@ local function BringItemWithItem2(item2)
 		--HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-5,5),5,math.random(-5,5))
 		wait(FastBring_Delay)
 		--HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-5,5),5,math.random(-5,5))
-		wait(FastBring_Delay)
+		--wait(FastBring_Delay)
 		--HMNRT.CFrame.Position = item2.PrimaryPart.CFrame.Position
 		--wait(FastBring_Delay)
 
@@ -931,6 +931,7 @@ local function BringItemWithItem2(item2)
 			for i=1,5 do
 				if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then return end
 				pcall(function()
+					wait(FastBring_Delay)
 					RequestStartDraggingItem:FireServer(item2)
 					wait(FastBring_Delay)
 				end)
