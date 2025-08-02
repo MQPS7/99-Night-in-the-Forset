@@ -11,6 +11,7 @@ character = player.Character;humanoid = character:FindFirstChildOfClass("Humanoi
 HMNRT = character:FindFirstChild("HumanoidRootPart");Camera = workspace.CurrentCamera
 plrGui = player.PlayerGui;Inventory = player:WaitForChild("Inventory")
 ScreenGui = Instance.new("ScreenGui", plrGui);Items = workspace:WaitForChild("Items")
+ScreenGui.Name = "SOMTANK-Script"
 Map = workspace:WaitForChild("Map")
 InnerTouchZone = Map:WaitForChild("Campground"):WaitForChild("MainFire"):WaitForChild("InnerTouchZone")
 CraftProx = Map:WaitForChild("Campground"):WaitForChild("CraftingBench"):WaitForChild("TouchZone"):WaitForChild("ProximityAttachment"):WaitForChild("ProximityInteraction")
@@ -249,7 +250,7 @@ gradient_IconLoad = Instance.new("UIGradient", LoadingIcon); gradient_IconLoad.R
 LoadingFrame.ZIndex = 2;LoadingBar1.ZIndex = 3;LoadingBar2.ZIndex = 4;LoadingText.ZIndex = 3;LoadingIcon.ZIndex = 3; gradient_IconLoad.Offset = Vector2.new(0, -1.5)
 IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.8a")
+VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.8b")
 FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -921,8 +922,8 @@ local function BringItemWithItem2(item2)
 			RequestStartDraggingItem:FireServer(item2)
 		end
 		if Target == "Character" then
-			wait(FastBring_Delay)
-			item2.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(math.random(-3,3),2,-3 + math.random(-3,3))
+			wait(FastBring_Delay)------HMNRT.CFrame
+			item2.PrimaryPart.CFrame = OldCFrame_Bring * CFrame.new(math.random(-3,3),2,-3 + math.random(-3,3))
 		elseif Target == "Craft" then
 			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = DashedLine.CFrame * CFrame.new(0,7,0)
@@ -1535,16 +1536,6 @@ task.spawn(function()
 		end
 	end
 end)
-task.spawn(function()
-	local fullText = ">>> SOMTANK-Script <<<" ; local windowSize = 6
-	while true do
-		for i = 1, #fullText - windowSize + 1 do
-			local view = fullText:sub(i, i + windowSize - 1)
-			ScreenGui.Name = view
-			wait(0.1)
-		end
-	end
-end)
 ---***** End UI *****----
 task.spawn(function()
 	while wait(0.5) do
@@ -1756,7 +1747,11 @@ task.spawn(function()
 			if ChildHead and ChildHead:FindFirstChild("ProximityAttachment") and ChildHead:FindFirstChild("ProximityAttachment"):FindFirstChildOfClass("ProximityPrompt") then
 				local Prox = ChildHead:FindFirstChild("ProximityAttachment"):FindFirstChildOfClass("ProximityPrompt")
 				if Prox then
+					HMNRT.CFrame = ChildHead.CFrame
+					wait(0.1)
 					fireproximityprompt(Prox)
+					wait(0.1)
+					HMNRT.CFrame = OldCFrame_Bring
 				end
 			end
 		end
@@ -1765,6 +1760,7 @@ task.spawn(function()
 		if Characters and AutoGetKid == true then
 			for _, item in ipairs(Characters:GetChildren()) do
 				if matchesAllowedKeyword(item.Name, {"Lost Child"}) then
+					OldCFrame_Bring = HMNRT.CFrame
 					Get_Child(Characters, item.Name)
 				end
 				wait()
