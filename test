@@ -250,7 +250,7 @@ gradient_IconLoad = Instance.new("UIGradient", LoadingIcon); gradient_IconLoad.R
 LoadingFrame.ZIndex = 2;LoadingBar1.ZIndex = 3;LoadingBar2.ZIndex = 4;LoadingText.ZIndex = 3;LoadingIcon.ZIndex = 3; gradient_IconLoad.Offset = Vector2.new(0, -1.5)
 IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.8d")
+VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.8g")
 FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -909,6 +909,7 @@ SetSlider4(Bring_Count_SlideBar, Bring_Count_Bar, Bring_Count, Bring_Count_Color
 local OldCFrame_Bring = HMNRT.CFrame
 local function BringItemWithItem2(item2)
 	pcall(function()
+		humanoid:MoveTo(item2.PrimaryPart.Position)
 		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),2,math.random(-3,3))
 		wait(FastBring_Delay)
 		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),2,math.random(-3,3))
@@ -926,7 +927,7 @@ local function BringItemWithItem2(item2)
 			RequestStartDraggingItem:FireServer(item2)
 		end
 		if Target == "Character" then
-			wait(FastBring_Delay)------HMNRT.CFrame
+			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = OldCFrame_Bring * CFrame.new(math.random(-3,3),2,-3 + math.random(-3,3))
 		elseif Target == "Craft" then
 			wait(FastBring_Delay)
@@ -1177,8 +1178,43 @@ TeleCamp_Button.Activated:Connect(function()
 	HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,7,0)
 end)
 
-local SetScriptTp_StrongHold = false; local CheckDaleyStrongHoldTpButton = 1
-local TeleStrongHold_Button, TeleTextMain_Button, TeleMain_Button = Create_Click(ModeTeleport_SelectFuntion, "สตรองโฮลด์ 💎")
+local SetScriptTp_StrongHold = false; local SetScriptTp_CraftHunt = false ; local CheckDaleyStrongHoldTpButton = 5
+local TeleStrongHold_Button, TeleTextMain_Button, TeleMainStrongHold_Button = Create_Click(ModeTeleport_SelectFuntion, "สตรองโฮลด์ 💎")
+local TeleCraftHunt_Button, CraftHuntTele_Button, TeleMainCraftHunt_Button = Create_Click(ModeTeleport_SelectFuntion, "ร้านขายเสื้อกันหนาว 👚")
+task.spawn(function()
+	TeleMainStrongHold_Button.Visible = false
+	TeleMainCraftHunt_Button.Visible = false
+	while wait(CheckDaleyStrongHoldTpButton) do
+		if Map then
+			if Map:FindFirstChild("Landmarks"):FindFirstChild("Stronghold") then
+				local Stronghold = Map:FindFirstChild("Landmarks"):FindFirstChild("Stronghold")
+				if Stronghold and Stronghold.PrimaryPart and SetScriptTp_StrongHold == false then
+					TeleMainStrongHold_Button.Visible = true
+					SetScriptTp_StrongHold = true
+					TeleStrongHold_Button.Activated:Connect(function()
+						pcall(function()
+							HMNRT.CFrame = Stronghold.PrimaryPart.CFrame * CFrame.new(0,7,0)
+						end)
+					end)
+				end
+			elseif Map:FindFirstChild("Landmarks"):FindFirstChild("Snow Clothing Shop") then
+				local Snow_Clothing_Shop = Map:FindFirstChild("Landmarks"):FindFirstChild("Snow Clothing Shop")
+				if Snow_Clothing_Shop and Snow_Clothing_Shop.PrimaryPart and SetScriptTp_CraftHunt == false then
+					TeleMainCraftHunt_Button.Visible = true
+					SetScriptTp_CraftHunt = true
+					TeleCraftHunt_Button.Activated:Connect(function()
+						pcall(function()
+							HMNRT.CFrame = Snow_Clothing_Shop.PrimaryPart.CFrame * CFrame.new(0,7,0)
+						end)
+					end)
+				end
+			end
+			if TeleMainStrongHold_Button.Visible == true and TeleMainCraftHunt_Button.Visible == true then
+				CheckDaleyStrongHoldTpButton = 60
+			end
+		end
+	end
+end)
 local NotThisNameTele = {"Spawn", "No Respawn", "Bush", "Burrow", "Portion", "Stack", "Flower", "Hollow", "Mud", "Grave", "Pillars", "Trap", "Stump", "Small Tree", "Wide", "Hole", "Well"}
 Landmarks = Map:WaitForChild("Landmarks")
 local function ResetAllStucInServer()
@@ -1209,8 +1245,10 @@ ModeTeleport.Activated:Connect(function()
 	ResetAllStucInServer()
 end)
 
-
 --workspace.Map.Landmarks["Snow Clothing Shop"].Main
+
+
+
 
 ---------------- **** ModeAuto_SelectFuntion **** ----------------
 
@@ -1671,27 +1709,6 @@ task.spawn(function()
 				end
 			else
 				Warpped = false
-			end
-		end
-	end
-end)
-task.spawn(function()
-	while wait(CheckDaleyStrongHoldTpButton) do
-		if Map then
-			if Map:FindFirstChild("Landmarks"):FindFirstChild("Stronghold") then
-				local Stronghold = Map:FindFirstChild("Landmarks"):FindFirstChild("Stronghold")
-				if Stronghold and Stronghold.PrimaryPart and SetScriptTp_StrongHold == false then
-					TeleMain_Button.Visible = true
-					SetScriptTp_StrongHold = true
-					CheckDaleyStrongHoldTpButton = 60
-					TeleStrongHold_Button.Activated:Connect(function()
-						pcall(function()
-							HMNRT.CFrame = Stronghold.PrimaryPart.CFrame * CFrame.new(0,7,0)
-						end)
-					end)
-				end
-			else
-				TeleMain_Button.Visible = false
 			end
 		end
 	end
