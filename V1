@@ -250,7 +250,7 @@ gradient_IconLoad = Instance.new("UIGradient", LoadingIcon); gradient_IconLoad.R
 LoadingFrame.ZIndex = 2;LoadingBar1.ZIndex = 3;LoadingBar2.ZIndex = 4;LoadingText.ZIndex = 3;LoadingIcon.ZIndex = 3; gradient_IconLoad.Offset = Vector2.new(0, -1.5)
 IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.9")
+VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.9a")
 FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -861,13 +861,13 @@ local TarFire_Button = Create_Click(ModeDrag_SelectFuntion, "กองไฟ")
 TarFire_Button.Activated:Connect(function()
 	Target = "Fire"
 end)
-local FastBring_Delay = 0.12
+local FastBring_Delay = 0.13
 local ModeDragLine_N1 = Create_Line(ModeDrag_SelectFuntion, "เพิ่มเติม ⚙️")
 local FastBring_Button = Create_Toggle(ModeDrag_SelectFuntion, "ดึงแบบเร็ว")
 local FastBring = false;FastBring_Button.Activated:Connect(function()
 	if FastBring == true then
 		FastBring = false
-		FastBring_Delay = 0.12
+		FastBring_Delay = 0.13
 	else
 		FastBring = true
 		FastBring_Delay = 0.07
@@ -922,11 +922,14 @@ local function BringItemWithItem2(item2)
 		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),2,math.random(-3,3))
 		wait(FastBring_Delay)
 
-		-- เพิ่มการตรวจสอบว่าควรหยุดหรือไม่
 		if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then
-			return -- หยุดการทำงานทันที
+			return
 		end
-
+		
+		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),2,math.random(-3,3))
+		wait(FastBring_Delay)
+		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),2,math.random(-3,3))
+		wait(FastBring_Delay)
 		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),2,math.random(-3,3))
 		wait(FastBring_Delay)
 		HMNRT.CFrame = item2.PrimaryPart.CFrame
@@ -979,9 +982,7 @@ local function CreateStoppableBringFunction(itemType, itemList, button, buttonTe
 			isRunning[itemType] = true
 			buttonText.Text = runningText .. " (กดอีกครั้งเพื่อหยุด)"
 			button.Active = true
-
 			OldCFrame_Bring = HMNRT.CFrame
-
 			spawn(function()
 				for _, item1 in ipairs(itemList:GetChildren()) do
 					if not isRunning[itemType] then break end
@@ -992,16 +993,14 @@ local function CreateStoppableBringFunction(itemType, itemList, button, buttonTe
 
 						for _, item2 in ipairs(Items:GetChildren()) do
 							if not isRunning[itemType] then break end
-
 							if item2.Name == TargetName and item2.PrimaryPart then
 								if Bring_Count_Work < Bring_Count then
 									BringItemWithItem2(item2)
 									Bring_Count_Work = Bring_Count_Work + 1
 								end
-							end
-
-							if FastBring == false then
-								wait()
+								if FastBring == false then
+									wait()
+								end
 							end
 						end
 					end
@@ -1021,7 +1020,6 @@ local Item_Weapon_Teble = {"Bandage", "Iron Body", "Leather Body", "MedKit", "Re
 local Item_Food_Teble = {"Apple", "Berry", "Cake", "Carrot", "Meat? Sandwich"}
 local Item_Scrap_Teble = {"Broken Microwave", "Metal Chair", "Old Car Engine", "Old Radio", "Sheet Metal", "Tyre", "UFO Junk", "UFO Scrap", "Washing Machine"}
 
--- ส่วนอาหาร
 local ModeDragLine_2 = Create_Line(ModeDrag_SelectFuntion, "อาหาร 🍇")
 local Drop_Food_Item, Drop_Food_Item_List, ResetButton_Bring_Food_Item = Create_SelectPick(ModeDrag_SelectFuntion, "เลือกไอเท็ม", 5)
 ResetButton_Bring_Food_Item.Visible = false
@@ -1118,9 +1116,9 @@ local function ResetAllItemInServer()
 							BringItemWithItem2(item2)
 							Bring_Count_Work = Bring_Count_Work + 1
 						end
-					end
-					if FastBring == false then
-						wait()
+						if FastBring == false then
+							wait()
+						end
 					end
 				end
 				HMNRT.CFrame = OldCFrame_Bring
