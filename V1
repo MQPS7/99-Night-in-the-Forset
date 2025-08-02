@@ -11,6 +11,7 @@ character = player.Character;humanoid = character:FindFirstChildOfClass("Humanoi
 HMNRT = character:FindFirstChild("HumanoidRootPart");Camera = workspace.CurrentCamera
 plrGui = player.PlayerGui;Inventory = player:WaitForChild("Inventory")
 ScreenGui = Instance.new("ScreenGui", plrGui);Items = workspace:WaitForChild("Items")
+ScreenGui.Name = "SOMTANK-Script"
 Map = workspace:WaitForChild("Map")
 InnerTouchZone = Map:WaitForChild("Campground"):WaitForChild("MainFire"):WaitForChild("InnerTouchZone")
 CraftProx = Map:WaitForChild("Campground"):WaitForChild("CraftingBench"):WaitForChild("TouchZone"):WaitForChild("ProximityAttachment"):WaitForChild("ProximityInteraction")
@@ -249,7 +250,7 @@ gradient_IconLoad = Instance.new("UIGradient", LoadingIcon); gradient_IconLoad.R
 LoadingFrame.ZIndex = 2;LoadingBar1.ZIndex = 3;LoadingBar2.ZIndex = 4;LoadingText.ZIndex = 3;LoadingIcon.ZIndex = 3; gradient_IconLoad.Offset = Vector2.new(0, -1.5)
 IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.8u")
+VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.8g")
 FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -869,10 +870,10 @@ local FastBring = false;FastBring_Button.Activated:Connect(function()
 		FastBring_Delay = 0.12
 	else
 		FastBring = true
-		FastBring_Delay = 0.06
+		FastBring_Delay = 0.07
 	end
 end)
-local Bring_Count = 100 ; local Max_Bring_Count = 100
+local Bring_Count = 10 ; local Max_Bring_Count = 100
 local Bring_Count_SlideBar, Bring_Count_Bar, Bring_Count_TextBox, Bring_Count_ShowValue, Bring_Count_Color, Bring_Count_ResetButton = Create_Slide_Textbox(ModeDrag_SelectFuntion, "จำนวนที่ต้องการดึง", "ใส่ค่าที่ต้องการเลยครับ", Bring_Count)
 local function SetSlider4(Bar, Slide, Defalse_Value, Color)
 	local slider_Bring_Count = createSlider(Bar, Slide, function(value)
@@ -890,7 +891,7 @@ local function SetSlider4(Bar, Slide, Defalse_Value, Color)
 		end
 	end)
 	Bring_Count_ResetButton.Activated:Connect(function()
-		Bring_Count = 1
+		Bring_Count = 10
 		slider_Bring_Count.SetValue(1)
 	end)
 	task.spawn(function()
@@ -908,7 +909,11 @@ SetSlider4(Bring_Count_SlideBar, Bring_Count_Bar, Bring_Count, Bring_Count_Color
 local OldCFrame_Bring = HMNRT.CFrame
 local function BringItemWithItem2(item2)
 	pcall(function()
-		OldCFrame_Bring = HMNRT.CFrame
+		humanoid:MoveTo(item2.PrimaryPart.Position)
+		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),2,math.random(-3,3))
+		wait(FastBring_Delay)
+		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),2,math.random(-3,3))
+		wait(FastBring_Delay)
 		HMNRT.CFrame = item2.PrimaryPart.CFrame
 		wait(FastBring_Delay)
 		if item2.Name == "Berry" then
@@ -923,7 +928,7 @@ local function BringItemWithItem2(item2)
 		end
 		if Target == "Character" then
 			wait(FastBring_Delay)
-			item2.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(math.random(-3,3),2,-3 + math.random(-3,3))
+			item2.PrimaryPart.CFrame = OldCFrame_Bring * CFrame.new(math.random(-3,3),2,-3 + math.random(-3,3))
 		elseif Target == "Craft" then
 			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = DashedLine.CFrame * CFrame.new(0,7,0)
@@ -937,6 +942,7 @@ local function BringItemWithItem2(item2)
 		HMNRT.CFrame = OldCFrame_Bring
 		wait(FastBring_Delay)
 		StopDraggingItem:FireServer(item2)
+		HMNRT.CFrame = OldCFrame_Bring
 		wait(FastBring_Delay)
 		StopDraggingItem:FireServer(item2)
 	end)
@@ -963,9 +969,10 @@ local Bring_Food_Button, Bring_Food_Button_Text = Create_Click(ModeDrag_SelectFu
 Bring_Food_Button.Activated:Connect(function()
 	Bring_Food_Button_Text.Text = "กำลังดึงอาหารที่เลือก"
 	Bring_Food_Button.Active = false
-	for _, item2 in ipairs(Drop_Food_Item_List:GetChildren()) do
-		if item2:IsA("RayValue") then
-			local TargetName = item2.Name
+	OldCFrame_Bring = HMNRT.CFrame
+	for _, item1 in ipairs(Drop_Food_Item_List:GetChildren()) do
+		if item1:IsA("RayValue") then
+			local TargetName = item1.Name
 			local Bring_Count_Work = 0
 			for _, item2 in ipairs(Items:GetChildren()) do
 				if item2.Name == TargetName and item2.PrimaryPart then
@@ -978,7 +985,6 @@ Bring_Food_Button.Activated:Connect(function()
 					wait()
 				end
 			end
-			HMNRT.CFrame = OldCFrame_Bring
 		end
 	end
 	HMNRT.CFrame = OldCFrame_Bring
@@ -1004,9 +1010,10 @@ local Bring_Fuel_Button, Bring_Fuel_Button_Text = Create_Click(ModeDrag_SelectFu
 Bring_Fuel_Button.Activated:Connect(function()
 	Bring_Fuel_Button_Text.Text = "กำลังดึงเชื้อเพลิงที่เลือก"
 	Bring_Fuel_Button.Active = false
-	for _, item2 in ipairs(Drop_Fuel_Item_List:GetChildren()) do
-		if item2:IsA("RayValue") then
-			local TargetName = item2.Name
+	OldCFrame_Bring = HMNRT.CFrame
+	for _, item1 in ipairs(Drop_Fuel_Item_List:GetChildren()) do
+		if item1:IsA("RayValue") then
+			local TargetName = item1.Name
 			local Bring_Count_Work = 0
 			for _, item2 in ipairs(Items:GetChildren()) do
 				if item2.Name == TargetName and item2.PrimaryPart then
@@ -1018,7 +1025,6 @@ Bring_Fuel_Button.Activated:Connect(function()
 				if FastBring == false then
 					wait()
 				end
-				HMNRT.CFrame = OldCFrame_Bring
 			end
 		end
 	end
@@ -1045,9 +1051,10 @@ local Bring_Scrap_Button, Bring_Scrap_Button_Text = Create_Click(ModeDrag_Select
 Bring_Scrap_Button.Activated:Connect(function()	
 	Bring_Scrap_Button_Text.Text = "กำลังดึงเศษเหล็กที่เลือก"
 	Bring_Scrap_Button.Active = false
-	for _, item2 in ipairs(Drop_Scrap_Item_List:GetChildren()) do
-		if item2:IsA("RayValue") then
-			local TargetName = item2.Name
+	OldCFrame_Bring = HMNRT.CFrame
+	for _, item1 in ipairs(Drop_Scrap_Item_List:GetChildren()) do
+		if item1:IsA("RayValue") then
+			local TargetName = item1.Name
 			local Bring_Count_Work = 0
 			for _, item2 in ipairs(Items:GetChildren()) do
 				if item2.Name == TargetName and item2.PrimaryPart then
@@ -1059,7 +1066,6 @@ Bring_Scrap_Button.Activated:Connect(function()
 				if FastBring == false then
 					wait()
 				end
-				HMNRT.CFrame = OldCFrame_Bring
 			end
 		end
 	end
@@ -1086,9 +1092,10 @@ local Bring_Weapon_Button, Bring_Weapon_Button_Text = Create_Click(ModeDrag_Sele
 Bring_Weapon_Button.Activated:Connect(function()	
 	Bring_Weapon_Button_Text.Text = "กำลังดึงอาวุธ"
 	Bring_Weapon_Button.Active = false
-	for _, item2 in ipairs(Drop_Weapon_Item_List:GetChildren()) do
-		if item2:IsA("RayValue") then
-			local TargetName = item2.Name
+	OldCFrame_Bring = HMNRT.CFrame
+	for _, item1 in ipairs(Drop_Weapon_Item_List:GetChildren()) do
+		if item1:IsA("RayValue") then
+			local TargetName = item1.Name
 			local Bring_Count_Work = 0
 			for _, item2 in ipairs(Items:GetChildren()) do
 				if item2.Name == TargetName and item2.PrimaryPart then
@@ -1121,6 +1128,7 @@ local function ResetAllItemInServer()
 		if not ModeDrag_SelectFuntion:FindFirstChild("Reset_"..item.Name) then
 			local NewBring_Button = Create_Click(ModeDrag_SelectFuntion, item.Name, "Reset_")
 			NewBring_Button.Activated:Connect(function()
+				OldCFrame_Bring = HMNRT.CFrame
 				local Bring_Count_Work = 0
 				for _, item2 in ipairs(Items:GetChildren()) do
 					if item2.Name == item.Name and item2.PrimaryPart then
@@ -1170,8 +1178,43 @@ TeleCamp_Button.Activated:Connect(function()
 	HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,7,0)
 end)
 
-local SetScriptTp_StrongHold = false; local CheckDaleyStrongHoldTpButton = 1
-local TeleStrongHold_Button, TeleTextMain_Button, TeleMain_Button = Create_Click(ModeTeleport_SelectFuntion, "สตรองโฮลด์ 💎")
+local SetScriptTp_StrongHold = false; local SetScriptTp_CraftHunt = false ; local CheckDaleyStrongHoldTpButton = 5
+local TeleStrongHold_Button, TeleTextMain_Button, TeleMainStrongHold_Button = Create_Click(ModeTeleport_SelectFuntion, "สตรองโฮลด์ 💎")
+local TeleCraftHunt_Button, CraftHuntTele_Button, TeleMainCraftHunt_Button = Create_Click(ModeTeleport_SelectFuntion, "ร้านขายเสื้อกันหนาว 👚")
+task.spawn(function()
+	TeleMainStrongHold_Button.Visible = false
+	TeleMainCraftHunt_Button.Visible = false
+	while wait(CheckDaleyStrongHoldTpButton) do
+		if Map then
+			if Map:FindFirstChild("Landmarks"):FindFirstChild("Stronghold") then
+				local Stronghold = Map:FindFirstChild("Landmarks"):FindFirstChild("Stronghold")
+				if Stronghold and Stronghold.PrimaryPart and SetScriptTp_StrongHold == false then
+					TeleMainStrongHold_Button.Visible = true
+					SetScriptTp_StrongHold = true
+					TeleStrongHold_Button.Activated:Connect(function()
+						pcall(function()
+							HMNRT.CFrame = Stronghold.PrimaryPart.CFrame * CFrame.new(0,7,0)
+						end)
+					end)
+				end
+			elseif Map:FindFirstChild("Landmarks"):FindFirstChild("Snow Clothing Shop") then
+				local Snow_Clothing_Shop = Map:FindFirstChild("Landmarks"):FindFirstChild("Snow Clothing Shop")
+				if Snow_Clothing_Shop and Snow_Clothing_Shop.PrimaryPart and SetScriptTp_CraftHunt == false then
+					TeleMainCraftHunt_Button.Visible = true
+					SetScriptTp_CraftHunt = true
+					TeleCraftHunt_Button.Activated:Connect(function()
+						pcall(function()
+							HMNRT.CFrame = Snow_Clothing_Shop.PrimaryPart.CFrame * CFrame.new(0,7,0)
+						end)
+					end)
+				end
+			end
+			if TeleMainStrongHold_Button.Visible == true and TeleMainCraftHunt_Button.Visible == true then
+				CheckDaleyStrongHoldTpButton = 60
+			end
+		end
+	end
+end)
 local NotThisNameTele = {"Spawn", "No Respawn", "Bush", "Burrow", "Portion", "Stack", "Flower", "Hollow", "Mud", "Grave", "Pillars", "Trap", "Stump", "Small Tree", "Wide", "Hole", "Well"}
 Landmarks = Map:WaitForChild("Landmarks")
 local function ResetAllStucInServer()
@@ -1201,6 +1244,11 @@ end
 ModeTeleport.Activated:Connect(function()
 	ResetAllStucInServer()
 end)
+
+--workspace.Map.Landmarks["Snow Clothing Shop"].Main
+
+
+
 
 ---------------- **** ModeAuto_SelectFuntion **** ----------------
 
@@ -1534,16 +1582,6 @@ task.spawn(function()
 		end
 	end
 end)
-task.spawn(function()
-	local fullText = ">>> SOMTANK-Script <<<" ; local windowSize = 6
-	while true do
-		for i = 1, #fullText - windowSize + 1 do
-			local view = fullText:sub(i, i + windowSize - 1)
-			ScreenGui.Name = view
-			wait(0.1)
-		end
-	end
-end)
 ---***** End UI *****----
 task.spawn(function()
 	while wait(0.5) do
@@ -1676,27 +1714,6 @@ task.spawn(function()
 	end
 end)
 task.spawn(function()
-	while wait(CheckDaleyStrongHoldTpButton) do
-		if Map then
-			if Map:FindFirstChild("Landmarks"):FindFirstChild("Stronghold") then
-				local Stronghold = Map:FindFirstChild("Landmarks"):FindFirstChild("Stronghold")
-				if Stronghold and Stronghold.PrimaryPart and SetScriptTp_StrongHold == false then
-					TeleMain_Button.Visible = true
-					SetScriptTp_StrongHold = true
-					CheckDaleyStrongHoldTpButton = 60
-					TeleStrongHold_Button.Activated:Connect(function()
-						pcall(function()
-							HMNRT.CFrame = Stronghold.PrimaryPart.CFrame * CFrame.new(0,7,0)
-						end)
-					end)
-				end
-			else
-				TeleMain_Button.Visible = false
-			end
-		end
-	end
-end)
-task.spawn(function()
 	local HungerBar = plrGui:WaitForChild("Interface"):WaitForChild("StatBars"):WaitForChild("HungerBar"):FindFirstChild("Bar")
 	while wait(0.5) do
 		if AutoFillHunger == true then
@@ -1755,7 +1772,11 @@ task.spawn(function()
 			if ChildHead and ChildHead:FindFirstChild("ProximityAttachment") and ChildHead:FindFirstChild("ProximityAttachment"):FindFirstChildOfClass("ProximityPrompt") then
 				local Prox = ChildHead:FindFirstChild("ProximityAttachment"):FindFirstChildOfClass("ProximityPrompt")
 				if Prox then
+					HMNRT.CFrame = ChildHead.CFrame
+					wait(0.1)
 					fireproximityprompt(Prox)
+					wait(0.1)
+					HMNRT.CFrame = OldCFrame_Bring
 				end
 			end
 		end
@@ -1764,6 +1785,7 @@ task.spawn(function()
 		if Characters and AutoGetKid == true then
 			for _, item in ipairs(Characters:GetChildren()) do
 				if matchesAllowedKeyword(item.Name, {"Lost Child"}) then
+					OldCFrame_Bring = HMNRT.CFrame
 					Get_Child(Characters, item.Name)
 				end
 				wait()
