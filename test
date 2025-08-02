@@ -915,17 +915,12 @@ local function BringItemWithItem2(item2)
 		if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then return end
 		humanoid.HipHeight = 16
 		
-		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
-		--HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-5,5),5,math.random(-5,5))
+		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(math.random(-3,3),3,16 + math.random(-3,3))
 		wait(FastBring_Delay)
-		--HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-5,5),5,math.random(-5,5))
 		wait(FastBring_Delay)
-		--HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-5,5),5,math.random(-5,5))
+		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,3,0)
 		wait(FastBring_Delay)
-		--HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-5,5),5,math.random(-5,5))
-		--wait(FastBring_Delay)
-		--HMNRT.CFrame.Position = item2.PrimaryPart.CFrame.Position
-		--wait(FastBring_Delay)
+		wait(FastBring_Delay)
 
 		if item2.Name == "Berry" and item2.Name == "Carrot" then
 			for i=1,5 do
@@ -956,11 +951,9 @@ local function BringItemWithItem2(item2)
 
 		HMNRT.CFrame = OldCFrame_Bring
 		wait(FastBring_Delay)
-		--StopDraggingItem:FireServer(item2)
-		--HMNRT.CFrame = OldCFrame_Bring
+		StopDraggingItem:FireServer(item2)
 		wait(FastBring_Delay)
-		--StopDraggingItem:FireServer(item2)
-		--HMNRT.CFrame = OldCFrame_Bring
+		StopDraggingItem:FireServer(item2)
 		wait(FastBring_Delay)
 		StopDraggingItem:FireServer(item2)
 		
