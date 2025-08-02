@@ -250,7 +250,7 @@ gradient_IconLoad = Instance.new("UIGradient", LoadingIcon); gradient_IconLoad.R
 LoadingFrame.ZIndex = 2;LoadingBar1.ZIndex = 3;LoadingBar2.ZIndex = 4;LoadingText.ZIndex = 3;LoadingIcon.ZIndex = 3; gradient_IconLoad.Offset = Vector2.new(0, -1.5)
 IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.9a")
+VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.9b")
 FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -861,16 +861,16 @@ local TarFire_Button = Create_Click(ModeDrag_SelectFuntion, "กองไฟ")
 TarFire_Button.Activated:Connect(function()
 	Target = "Fire"
 end)
-local FastBring_Delay = 0.13
+local FastBring_Delay = 0.14
 local ModeDragLine_N1 = Create_Line(ModeDrag_SelectFuntion, "เพิ่มเติม ⚙️")
 local FastBring_Button = Create_Toggle(ModeDrag_SelectFuntion, "ดึงแบบเร็ว")
 local FastBring = false;FastBring_Button.Activated:Connect(function()
 	if FastBring == true then
 		FastBring = false
-		FastBring_Delay = 0.13
+		FastBring_Delay = 0.14
 	else
 		FastBring = true
-		FastBring_Delay = 0.07
+		FastBring_Delay = 0.08
 	end
 end)
 Bring_Count = 10 ;Max_Bring_Count = 100
@@ -906,40 +906,29 @@ local function SetSlider4(Bar, Slide, Defalse_Value, Color)
 	end)
 end
 SetSlider4(Bring_Count_SlideBar, Bring_Count_Bar, Bring_Count, Bring_Count_Color)
--- เพิ่มตัวแปรสำหรับควบคุมการหยุด
-local isRunning = {
-	food = false,
-	fuel = false,
-	scrap = false,
-	weapon = false
-}
 
+local isRunning = {food = false,fuel = false,scrap = false,weapon = false}
 local OldCFrame_Bring = HMNRT.CFrame
 
 local function BringItemWithItem2(item2)
 	pcall(function()
-		humanoid:MoveTo(item2.PrimaryPart.Position)
-		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),2,math.random(-3,3))
-		wait(FastBring_Delay)
-
-		if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then
-			return
-		end
+		if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then return end
 		
-		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),2,math.random(-3,3))
+		humanoid:MoveTo(item2.PrimaryPart.Position)
+		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),5,math.random(-3,3))
 		wait(FastBring_Delay)
-		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),2,math.random(-3,3))
+		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),5,math.random(-3,3))
 		wait(FastBring_Delay)
-		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),2,math.random(-3,3))
+		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),5,math.random(-3,3))
+		wait(FastBring_Delay)
+		HMNRT.CFrame = item2.PrimaryPart.CFrame * CFrame.new(math.random(-3,3),5,math.random(-3,3))
 		wait(FastBring_Delay)
 		HMNRT.CFrame = item2.PrimaryPart.CFrame
 		wait(FastBring_Delay)
 
-		if item2.Name == "Berry" then
+		if item2.Name == "Berry" and item2.Name == "Carrot" then
 			for i=1,5 do
-				if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then
-					return -- หยุดการทำงานทันที
-				end
+				if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then return end
 				pcall(function()
 					RequestStartDraggingItem:FireServer(item2)
 					wait(FastBring_Delay)
@@ -951,7 +940,7 @@ local function BringItemWithItem2(item2)
 
 		if Target == "Character" then
 			wait(FastBring_Delay)
-			item2.PrimaryPart.CFrame = OldCFrame_Bring * CFrame.new(math.random(-3,3),2,-3 + math.random(-3,3))
+			item2.PrimaryPart.CFrame = OldCFrame_Bring * CFrame.new(math.random(-3,3),3,-3 + math.random(-3,3))
 		elseif Target == "Craft" then
 			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = DashedLine.CFrame * CFrame.new(0,7,0)
@@ -963,6 +952,9 @@ local function BringItemWithItem2(item2)
 			item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(0,15,0)
 		end
 
+		HMNRT.CFrame = OldCFrame_Bring
+		wait(FastBring_Delay)
+		StopDraggingItem:FireServer(item2)
 		HMNRT.CFrame = OldCFrame_Bring
 		wait(FastBring_Delay)
 		StopDraggingItem:FireServer(item2)
@@ -1224,11 +1216,6 @@ end
 ModeTeleport.Activated:Connect(function()
 	ResetAllStucInServer()
 end)
-
---workspace.Map.Landmarks["Snow Clothing Shop"].Main
-
-
-
 
 ---------------- **** ModeAuto_SelectFuntion **** ----------------
 
