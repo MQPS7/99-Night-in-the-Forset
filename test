@@ -249,7 +249,7 @@ gradient_IconLoad = Instance.new("UIGradient", LoadingIcon); gradient_IconLoad.R
 LoadingFrame.ZIndex = 2;LoadingBar1.ZIndex = 3;LoadingBar2.ZIndex = 4;LoadingText.ZIndex = 3;LoadingIcon.ZIndex = 3; gradient_IconLoad.Offset = Vector2.new(0, -1.5)
 IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.8r")
+VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.8a")
 FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -908,7 +908,6 @@ SetSlider4(Bring_Count_SlideBar, Bring_Count_Bar, Bring_Count, Bring_Count_Color
 local OldCFrame_Bring = HMNRT.CFrame
 local function BringItemWithItem2(item2)
 	pcall(function()
-		OldCFrame_Bring = HMNRT.CFrame
 		HMNRT.CFrame = item2.PrimaryPart.CFrame
 		wait(FastBring_Delay)
 		if item2.Name == "Berry" then
@@ -963,6 +962,7 @@ local Bring_Food_Button, Bring_Food_Button_Text = Create_Click(ModeDrag_SelectFu
 Bring_Food_Button.Activated:Connect(function()
 	Bring_Food_Button_Text.Text = "กำลังดึงอาหารที่เลือก"
 	Bring_Food_Button.Active = false
+	OldCFrame_Bring = HMNRT.CFrame
 	for _, item1 in ipairs(Drop_Food_Item_List:GetChildren()) do
 		if item1:IsA("RayValue") then
 			local TargetName = item1.Name
@@ -978,7 +978,6 @@ Bring_Food_Button.Activated:Connect(function()
 					wait()
 				end
 			end
-			HMNRT.CFrame = OldCFrame_Bring
 		end
 	end
 	HMNRT.CFrame = OldCFrame_Bring
@@ -1004,6 +1003,7 @@ local Bring_Fuel_Button, Bring_Fuel_Button_Text = Create_Click(ModeDrag_SelectFu
 Bring_Fuel_Button.Activated:Connect(function()
 	Bring_Fuel_Button_Text.Text = "กำลังดึงเชื้อเพลิงที่เลือก"
 	Bring_Fuel_Button.Active = false
+	OldCFrame_Bring = HMNRT.CFrame
 	for _, item1 in ipairs(Drop_Fuel_Item_List:GetChildren()) do
 		if item1:IsA("RayValue") then
 			local TargetName = item1.Name
@@ -1018,7 +1018,6 @@ Bring_Fuel_Button.Activated:Connect(function()
 				if FastBring == false then
 					wait()
 				end
-				HMNRT.CFrame = OldCFrame_Bring
 			end
 		end
 	end
@@ -1045,6 +1044,7 @@ local Bring_Scrap_Button, Bring_Scrap_Button_Text = Create_Click(ModeDrag_Select
 Bring_Scrap_Button.Activated:Connect(function()	
 	Bring_Scrap_Button_Text.Text = "กำลังดึงเศษเหล็กที่เลือก"
 	Bring_Scrap_Button.Active = false
+	OldCFrame_Bring = HMNRT.CFrame
 	for _, item1 in ipairs(Drop_Scrap_Item_List:GetChildren()) do
 		if item1:IsA("RayValue") then
 			local TargetName = item1.Name
@@ -1059,7 +1059,6 @@ Bring_Scrap_Button.Activated:Connect(function()
 				if FastBring == false then
 					wait()
 				end
-				HMNRT.CFrame = OldCFrame_Bring
 			end
 		end
 	end
@@ -1086,6 +1085,7 @@ local Bring_Weapon_Button, Bring_Weapon_Button_Text = Create_Click(ModeDrag_Sele
 Bring_Weapon_Button.Activated:Connect(function()	
 	Bring_Weapon_Button_Text.Text = "กำลังดึงอาวุธ"
 	Bring_Weapon_Button.Active = false
+	OldCFrame_Bring = HMNRT.CFrame
 	for _, item1 in ipairs(Drop_Weapon_Item_List:GetChildren()) do
 		if item1:IsA("RayValue") then
 			local TargetName = item1.Name
@@ -1121,6 +1121,7 @@ local function ResetAllItemInServer()
 		if not ModeDrag_SelectFuntion:FindFirstChild("Reset_"..item.Name) then
 			local NewBring_Button = Create_Click(ModeDrag_SelectFuntion, item.Name, "Reset_")
 			NewBring_Button.Activated:Connect(function()
+				OldCFrame_Bring = HMNRT.CFrame
 				local Bring_Count_Work = 0
 				for _, item2 in ipairs(Items:GetChildren()) do
 					if item2.Name == item.Name and item2.PrimaryPart then
