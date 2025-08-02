@@ -250,7 +250,7 @@ gradient_IconLoad = Instance.new("UIGradient", LoadingIcon); gradient_IconLoad.R
 LoadingFrame.ZIndex = 2;LoadingBar1.ZIndex = 3;LoadingBar2.ZIndex = 4;LoadingText.ZIndex = 3;LoadingIcon.ZIndex = 3; gradient_IconLoad.Offset = Vector2.new(0, -1.5)
 IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.9b")
+VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.0.9c")
 FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -1612,22 +1612,20 @@ task.spawn(function()
 			for _, obj in pairs(workspace.Characters:GetChildren()) do
 				if obj:IsA("Model") and obj:FindFirstChild("NPC") and obj:FindFirstChild("HumanoidRootPart") then
 					local dist = (obj.HumanoidRootPart.Position - HMNRT.Position).Magnitude
-					if dist <= Kill_Aura_Dis and dist < nearestDistance and KillAura == true then
+					if dist <= Kill_Aura_Dis and KillAura == true then
 						nearestDistance = dist
-						nearest = obj
+						if obj then
+							local RootPart = obj:FindFirstChild("HumanoidRootPart")
+							if OnTopEnameis == true and RootPart then
+								HMNRT.CFrame = RootPart.CFrame * CFrame.new(0,67,0)
+							end
+							if RootPart and ToolDamageObject and PlayerAxe then
+								local Kill_args = {obj,PlayerAxe,"9_989989898",CFrame.new(RootPart.Position.X, RootPart.Position.Y, RootPart.Position.Z, 0, 0, 0, 2, 0, 0, 0, -0.2, 0.6)}
+								ToolDamageObject:InvokeServer(unpack(Kill_args))
+							end
+						end
 					end
 				end	
-			end
-			if nearest then
-				local Humanoid = nearest:FindFirstChild("NPC")
-				local RootPart = nearest:FindFirstChild("HumanoidRootPart")
-				if OnTopEnameis == true and RootPart then
-					HMNRT.CFrame = RootPart.CFrame * CFrame.new(0,67,0)
-				end
-				if RootPart and ToolDamageObject and PlayerAxe then
-					local Kill_args = {nearest,PlayerAxe,"9_989989898",CFrame.new(RootPart.Position.X, RootPart.Position.Y, RootPart.Position.Z, 0, 0, 0, 2, 0, 0, 0, -0.2, 0.6)}
-					ToolDamageObject:InvokeServer(unpack(Kill_args))
-				end
 			end
 		end
 	end
