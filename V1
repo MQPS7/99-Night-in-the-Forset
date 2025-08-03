@@ -31,7 +31,7 @@ RequestHotbarItem = RemoteEvents:FindFirstChild("RequestHotbarItem")
 RequestConsumeItem = RemoteEvents:FindFirstChild("RequestConsumeItem")
 RequestBagStoreItem = RemoteEvents:WaitForChild("RequestBagStoreItem")
 RequestBagDropItem = RemoteEvents:WaitForChild("RequestBagDropItem")
-EquipItemHandle =RemoteEvents:FindFirstChild("EquipItemHandle")
+EquipItemHandle = RemoteEvents:FindFirstChild("EquipItemHandle")
 ItemBag = player:WaitForChild("ItemBag")
 Foliage = Map:WaitForChild("Foliage")
 
@@ -971,25 +971,31 @@ local function BringItemWithItem2(item2)
 				if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then return end
 				pcall(function()
 					RequestStartDraggingItem:FireServer(item2)
-					wait(0.1)
+					wait(0.13)
 				end)
 			end
 		end
 		
 		RequestBagStoreItem:InvokeServer(Sack_Have,item2)
+		wait(FastBring_Delay)
+		
 
 		if Target == "Character" then
 			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = OldCFrame_Bring * CFrame.new(math.random(-3,3),3,-3 + math.random(-3,3))
+			HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
 		elseif Target == "Craft" then
 			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = DashedLine.CFrame * CFrame.new(0,7,0)
+			HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
 		elseif Target == "NearCamp" then
 			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(-20,2,0)
+			HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
 		elseif Target == "Fire" then
 			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(0,15,0)
+			HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
 		end
 		
 		RequestBagDropItem:FireServer(Sack_Have,item2)
@@ -1694,7 +1700,9 @@ task.spawn(function()
 		if KillAura == true then
 
 			if Inventory:FindFirstChild("Spear") then
+				print("Found Spear")
 				if not character:FindFirstChild("Spear") then
+					
 					if character:FindFirstChild("Old Axe") then
 						character:FindFirstChild("Old Axe"):Destroy()
 					elseif character:FindFirstChild("Good Axe") then
@@ -1702,15 +1710,15 @@ task.spawn(function()
 					elseif character:FindFirstChild("Strong Axe") then
 						character:FindFirstChild("Strong Axe"):Destroy()
 					end
+					
 					local Spear = Inventory:FindFirstChild("Spear")
 
-					local Spear_args = {"FireAllClients",Spear}
 					local NewSpear = Spear:Clone()
 					local OldSpear_WeldConstraint = Instance.new("WeldConstraint", NewSpear.PrimaryPart)
 					NewSpear.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(1.2,1.2,-2)
 					OldSpear_WeldConstraint.Part0 = NewSpear.PrimaryPart
 					OldSpear_WeldConstraint.Part1 = HMNRT
-					EquipItemHandle:FireServer(unpack(Spear_args))
+					EquipItemHandle:FireServer("FireAllClients",Spear)
 					NewSpear.Parent = character
 					for _, item in ipairs(NewSpear:GetChildren()) do
 						if item:IsA("BasePart") then
@@ -1719,7 +1727,9 @@ task.spawn(function()
 					end
 
 					SpearUser = NewSpear
-
+					
+					print("Set Spear")
+					
 				end
 			else
 				if not character:FindFirstChild("ToolHandle") then
@@ -1727,6 +1737,7 @@ task.spawn(function()
 				end
 			end
 			repeat
+				local Whatitem = " Axe "
 				for _, obj in pairs(workspace.Characters:GetChildren()) do
 					if obj:IsA("Model") and obj:FindFirstChild("NPC") and obj:FindFirstChild("HumanoidRootPart") then
 						local dist = (obj.HumanoidRootPart.Position - HMNRT.Position).Magnitude
@@ -1740,10 +1751,12 @@ task.spawn(function()
 									if PlayerAxe then
 										local Kill_args = {obj,PlayerAxe,"9_989989898",CFrame.new(RootPart.Position.X, RootPart.Position.Y, RootPart.Position.Z, 0, 0, 0, 2, 0, 0, 0, -0.2, 0.6)}
 										ToolDamageObject:InvokeServer(unpack(Kill_args))
+										Whatitem = " Axe "
 									end
 									if SpearUser then
 										local Kill_args = {obj,SpearUser,"9_989989898",CFrame.new(RootPart.Position.X, RootPart.Position.Y, RootPart.Position.Z, 0, 0, 0, 2, 0, 0, 0, -0.2, 0.6)}
 										ToolDamageObject:InvokeServer(unpack(Kill_args))
+										Whatitem = " Spear "
 									end
 								end
 							end)
@@ -1751,7 +1764,7 @@ task.spawn(function()
 					end	
 				end
 				wait(0.2)
-				print("****************** Kill Aura ************************")
+				print("****** Kill Aura With".. Whatitem .."***********")
 			until KillAura == false
 		end
 	end
