@@ -31,7 +31,7 @@ RequestHotbarItem = RemoteEvents:FindFirstChild("RequestHotbarItem")
 RequestConsumeItem = RemoteEvents:FindFirstChild("RequestConsumeItem")
 RequestBagStoreItem = RemoteEvents:WaitForChild("RequestBagStoreItem")
 RequestBagDropItem = RemoteEvents:WaitForChild("RequestBagDropItem")
-EquipItemHandle =RemoteEvents:FindFirstChild("EquipItemHandle")
+EquipItemHandle = RemoteEvents:FindFirstChild("EquipItemHandle")
 ItemBag = player:WaitForChild("ItemBag")
 Foliage = Map:WaitForChild("Foliage")
 
@@ -1700,7 +1700,7 @@ task.spawn(function()
 		if KillAura == true then
 
 			if Inventory:FindFirstChild("Spear") then
-				
+				print("Found Spear")
 				if not character:FindFirstChild("Spear") then
 					
 					if character:FindFirstChild("Old Axe") then
@@ -1710,15 +1710,15 @@ task.spawn(function()
 					elseif character:FindFirstChild("Strong Axe") then
 						character:FindFirstChild("Strong Axe"):Destroy()
 					end
+					
 					local Spear = Inventory:FindFirstChild("Spear")
 
-					local Spear_args = {"FireAllClients",Spear}
 					local NewSpear = Spear:Clone()
 					local OldSpear_WeldConstraint = Instance.new("WeldConstraint", NewSpear.PrimaryPart)
 					NewSpear.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(1.2,1.2,-2)
 					OldSpear_WeldConstraint.Part0 = NewSpear.PrimaryPart
 					OldSpear_WeldConstraint.Part1 = HMNRT
-					EquipItemHandle:FireServer(unpack(Spear_args))
+					EquipItemHandle:FireServer("FireAllClients",Spear)
 					NewSpear.Parent = character
 					for _, item in ipairs(NewSpear:GetChildren()) do
 						if item:IsA("BasePart") then
@@ -1727,7 +1727,9 @@ task.spawn(function()
 					end
 
 					SpearUser = NewSpear
-
+					
+					print("Set Spear")
+					
 				end
 			else
 				if not character:FindFirstChild("ToolHandle") then
