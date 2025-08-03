@@ -971,7 +971,7 @@ local function BringItemWithItem2(item2)
 				if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then return end
 				pcall(function()
 					RequestStartDraggingItem:FireServer(item2)
-					wait(0.1)
+					wait(0.13)
 				end)
 			end
 		end
@@ -1694,7 +1694,9 @@ task.spawn(function()
 		if KillAura == true then
 
 			if Inventory:FindFirstChild("Spear") then
+				
 				if not character:FindFirstChild("Spear") then
+					
 					if character:FindFirstChild("Old Axe") then
 						character:FindFirstChild("Old Axe"):Destroy()
 					elseif character:FindFirstChild("Good Axe") then
@@ -1727,6 +1729,7 @@ task.spawn(function()
 				end
 			end
 			repeat
+				local Whatitem = " Axe "
 				for _, obj in pairs(workspace.Characters:GetChildren()) do
 					if obj:IsA("Model") and obj:FindFirstChild("NPC") and obj:FindFirstChild("HumanoidRootPart") then
 						local dist = (obj.HumanoidRootPart.Position - HMNRT.Position).Magnitude
@@ -1740,10 +1743,12 @@ task.spawn(function()
 									if PlayerAxe then
 										local Kill_args = {obj,PlayerAxe,"9_989989898",CFrame.new(RootPart.Position.X, RootPart.Position.Y, RootPart.Position.Z, 0, 0, 0, 2, 0, 0, 0, -0.2, 0.6)}
 										ToolDamageObject:InvokeServer(unpack(Kill_args))
+										Whatitem = " Axe "
 									end
 									if SpearUser then
 										local Kill_args = {obj,SpearUser,"9_989989898",CFrame.new(RootPart.Position.X, RootPart.Position.Y, RootPart.Position.Z, 0, 0, 0, 2, 0, 0, 0, -0.2, 0.6)}
 										ToolDamageObject:InvokeServer(unpack(Kill_args))
+										Whatitem = " Spear "
 									end
 								end
 							end)
@@ -1751,7 +1756,7 @@ task.spawn(function()
 					end	
 				end
 				wait(0.2)
-				print("****************** Kill Aura ************************")
+				print("****** Kill Aura With".. Whatitem .."***********")
 			until KillAura == false
 		end
 	end
