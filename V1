@@ -253,7 +253,7 @@ gradient_IconLoad = Instance.new("UIGradient", LoadingIcon); gradient_IconLoad.R
 LoadingFrame.ZIndex = 2;LoadingBar1.ZIndex = 3;LoadingBar2.ZIndex = 4;LoadingText.ZIndex = 3;LoadingIcon.ZIndex = 3; gradient_IconLoad.Offset = Vector2.new(0, -1.5)
 IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.1.0a")
+VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.1.0b")
 FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -918,10 +918,10 @@ local function BringItemWithItem2(item2)
 		if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then return end
 		humanoid.HipHeight = 16
 		
-		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(math.random(-3,3),3,16 + math.random(-3,3))
+		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(math.random(-3,3),16,math.random(-3,3))
 		wait(FastBring_Delay)
 		wait(FastBring_Delay)
-		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,3,0)
+		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
 		wait(FastBring_Delay)
 		wait(FastBring_Delay)
 
@@ -1296,7 +1296,7 @@ RunService.RenderStepped:Connect(function(dt)
 				HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,7,0)
 			end
 			repeat
-				wait(0.1)
+				wait(1)
 			until AutoLoadMap == false
 		end
 	end
@@ -1398,7 +1398,7 @@ task.spawn(function()
 						NewText.Font = Enum.Font.Highway
 						pcall(function()
 							repeat
-								wait(0.01)
+								wait(0.5)
 							until item2.PrimaryPart.ProximityAttachment.ProximityInteraction
 							local Prox = item2.PrimaryPart.ProximityAttachment.ProximityInteraction
 							Prox.Triggered:Connect(function()
@@ -1561,10 +1561,10 @@ task.spawn(function()
 				game:GetService("StarterGui"):SetCore("SendNotification", {Title = "⚠️ ห้ามถืออุปกรต่างๆ",Text = "เพื่อประสิทธิภาพสูงสุด",Duration = 10})
 				local kokooolop = 0
 				repeat
-					wait(0.1)
+					wait(0.3)
 					kokooolop = kokooolop + 0.1
 				until kokooolop >= 14 or DontEquipTool == false
-				wait(0.1)
+				wait(0.3)
 			until DontEquipTool == false
 		end
 	end
@@ -1611,33 +1611,34 @@ task.spawn(function()
 		if KillAura == true then
 			
 			if Inventory:FindFirstChild("Spear") then
-				if character:FindFirstChild("Old Axe") then
-					character:FindFirstChild("Old Axe"):Destroy()
-				elseif character:FindFirstChild("Good Axe") then
-					character:FindFirstChild("Good Axe"):Destroy()
-				elseif character:FindFirstChild("Strong Axe") then
-					character:FindFirstChild("Strong Axe"):Destroy()
-				end
-				local Spear = Inventory:FindFirstChild("Spear")
-				
-				local Spear_args = {"FireAllClients",Spear}
-				local NewSpear = Spear:Clone()
-				local OldSpear_WeldConstraint = Instance.new("WeldConstraint", NewSpear.PrimaryPart)
-				NewSpear.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(1.2,1.2,-2)
-				OldSpear_WeldConstraint.Part0 = NewSpear.PrimaryPart
-				OldSpear_WeldConstraint.Part1 = HMNRT
-				EquipItemHandle:FireServer(unpack(Spear_args))
-				NewSpear.Parent = character
-				for _, item in ipairs(NewSpear:GetChildren()) do
-					if item:IsA("BasePart") then
-						item.Transparency = 1
+				if not character:FindFirstChild("Spear") then
+					if character:FindFirstChild("Old Axe") then
+						character:FindFirstChild("Old Axe"):Destroy()
+					elseif character:FindFirstChild("Good Axe") then
+						character:FindFirstChild("Good Axe"):Destroy()
+					elseif character:FindFirstChild("Strong Axe") then
+						character:FindFirstChild("Strong Axe"):Destroy()
 					end
+					local Spear = Inventory:FindFirstChild("Spear")
+
+					local Spear_args = {"FireAllClients",Spear}
+					local NewSpear = Spear:Clone()
+					local OldSpear_WeldConstraint = Instance.new("WeldConstraint", NewSpear.PrimaryPart)
+					NewSpear.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(1.2,1.2,-2)
+					OldSpear_WeldConstraint.Part0 = NewSpear.PrimaryPart
+					OldSpear_WeldConstraint.Part1 = HMNRT
+					EquipItemHandle:FireServer(unpack(Spear_args))
+					NewSpear.Parent = character
+					for _, item in ipairs(NewSpear:GetChildren()) do
+						if item:IsA("BasePart") then
+							item.Transparency = 1
+						end
+					end
+
+					SpearUser = NewSpear
+
+					print("Set Spear Kill Aura")
 				end
-				
-				SpearUser = NewSpear
-				
-				print("Set Spear Kill Aura")
-				
 			else
 				if not character:FindFirstChild("ToolHandle") then
 					EquipAxe()
@@ -1666,7 +1667,7 @@ task.spawn(function()
 						end
 					end	
 				end
-				wait(0.2)
+				wait(0.3)
 			until KillAura == false
 		end
 	end
@@ -1678,7 +1679,7 @@ task.spawn(function()
 				if item2 and matchesAllowedKeyword(item2.Name, {"Chest"}) and item2.PrimaryPart then
 					pcall(function()
 						repeat
-							wait(0.1)
+							wait(0.3)
 						until item2.PrimaryPart.ProximityAttachment.ProximityInteraction
 						local Prox = item2.PrimaryPart.ProximityAttachment.ProximityInteraction
 						Prox.HoldDuration = 0
@@ -1779,9 +1780,9 @@ task.spawn(function()
 				local Prox = ChildHead:FindFirstChild("ProximityAttachment"):FindFirstChildOfClass("ProximityPrompt")
 				if Prox then
 					HMNRT.CFrame = ChildHead.CFrame
-					wait(0.1)
+					wait(0.15)
 					fireproximityprompt(Prox)
-					wait(0.1)
+					wait(0.15)
 					HMNRT.CFrame = OldCFrame_Bring
 				end
 			end
