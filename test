@@ -5,26 +5,38 @@ if tonumber(game.PlaceId) == 79546208627805 then
 	end
 end
 TweenService = game:GetService("TweenService");RunService = game:GetService("RunService")
-Lighting = game:GetService("Lighting");replicatedStorage = game:GetService("ReplicatedStorage")
-UIS = game:GetService("UserInputService");player = game.Players.LocalPlayer
+Lighting = game:GetService("Lighting")
+replicatedStorage = game:GetService("ReplicatedStorage")
+UIS = game:GetService("UserInputService")
+player = game.Players.LocalPlayer
 character = player.Character;humanoid = character:FindFirstChildOfClass("Humanoid")
-HMNRT = character:FindFirstChild("HumanoidRootPart");Camera = workspace.CurrentCamera
-plrGui = player.PlayerGui;Inventory = player:WaitForChild("Inventory")
-ScreenGui = Instance.new("ScreenGui", plrGui);Items = workspace:WaitForChild("Items")
+HMNRT = character:FindFirstChild("HumanoidRootPart")
+Camera = workspace.CurrentCamera
+plrGui = player.PlayerGui
+Inventory = player:WaitForChild("Inventory")
+ScreenGui = Instance.new("ScreenGui", plrGui)
+Items = workspace:WaitForChild("Items")
+
 ScreenGui.Name = "SOMTANK-Script"
+
 Map = workspace:WaitForChild("Map")
 InnerTouchZone = Map:WaitForChild("Campground"):WaitForChild("MainFire"):WaitForChild("InnerTouchZone")
 CraftProx = Map:WaitForChild("Campground"):WaitForChild("CraftingBench"):WaitForChild("TouchZone"):WaitForChild("ProximityAttachment"):WaitForChild("ProximityInteraction")
 DashedLine = Map:WaitForChild("Campground"):WaitForChild("Scrapper"):WaitForChild("DashedLine")
 RemoteEvents = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents")
 RequestStartDraggingItem = RemoteEvents:FindFirstChild("RequestStartDraggingItem")
-StopDraggingItem = RemoteEvents:FindFirstChild("StopDraggingItem");--UnequipItemHandle = RemoteEvents:WaitForChild("UnequipItemHandle")
-EquipItemHandle = RemoteEvents:WaitForChild("RemoteEvents"):WaitForChild("EquipItemHandle"):WaitForChild("EquipItemHandle");ToolDamageObject = RemoteEvents:WaitForChild("ToolDamageObject")
-RequestHotbarItem = RemoteEvents:FindFirstChild("RequestHotbarItem");RequestConsumeItem = RemoteEvents:FindFirstChild("RequestConsumeItem")
-RequestBagStoreItem = RemoteEvents:WaitForChild("RemoteEvents"):WaitForChild("RequestBagStoreItem")
-RequestBagDropItem = RemoteEvents:WaitForChild("RemoteEvents"):WaitForChild("RequestBagDropItem")
+StopDraggingItem = RemoteEvents:FindFirstChild("StopDraggingItem")
+ToolDamageObject = RemoteEvents:WaitForChild("ToolDamageObject")
+RequestHotbarItem = RemoteEvents:FindFirstChild("RequestHotbarItem")
+RequestConsumeItem = RemoteEvents:FindFirstChild("RequestConsumeItem")
+RequestBagStoreItem = RemoteEvents:WaitForChild("RequestBagStoreItem")
+RequestBagDropItem = RemoteEvents:WaitForChild("RequestBagDropItem")
+EquipItemHandle =RemoteEvents:FindFirstChild("EquipItemHandle")
 ItemBag = player:WaitForChild("ItemBag")
 Foliage = Map:WaitForChild("Foliage")
+
+print("Set All local")
+
 PlayerAxe = nil ;Auto_FOOD = false ;DontEquipTool = false
 local function EquipAxe()
 	local AxeFound = nil
