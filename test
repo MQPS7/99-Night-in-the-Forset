@@ -1010,12 +1010,14 @@ local function CreateStoppableBringFunction(itemType, itemList, button, buttonTe
 			wait(0.5)
 		until Sack_Have ~= nil and Equiped_Sack == true
 		
-		if Sack_Have.Name == "Old Sack" then
-			Sack_Space_Count = 5
-		elseif Sack_Have.Name == "Good Sack" then
-			Sack_Space_Count = 15
-		elseif Sack_Have.Name == "Giant Sack" then
-			Sack_Space_Count = 25
+		if Sack_Have then
+			if Sack_Have.Name == "Old Sack" then
+				Sack_Space_Count = 5
+			elseif Sack_Have.Name == "Good Sack" then
+				Sack_Space_Count = 15
+			elseif Sack_Have.Name == "Giant Sack" then
+				Sack_Space_Count = 25
+			end
 		end
 		
 		repeat
