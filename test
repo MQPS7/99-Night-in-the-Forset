@@ -916,7 +916,7 @@ SetSlider4(Bring_Count_SlideBar, Bring_Count_Bar, Bring_Count, Bring_Count_Color
 local isRunning = {food = false,fuel = false,scrap = false,weapon = false}
 local OldCFrame_Bring = HMNRT.CFrame
 local Sack_Space_Count = 5
-
+local Sack_Have = nil
 local function EquipSack(Tool)
 	local NewTool = Tool:Clone()
 	local OldAxe_WeldConstraint = Instance.new("WeldConstraint", NewTool.PrimaryPart)
@@ -971,7 +971,6 @@ end
 
 local function CreateStoppableBringFunction(itemType, itemList, button, buttonText, normalText, runningText)
 	button.Activated:Connect(function()
-		local Sack_Have = nil
 		local Equiped_Sack = false
 		
 		if Sack_Have.Name == "Old Sack" then
