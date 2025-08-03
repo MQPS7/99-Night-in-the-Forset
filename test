@@ -19,8 +19,11 @@ DashedLine = Map:WaitForChild("Campground"):WaitForChild("Scrapper"):WaitForChil
 RemoteEvents = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents")
 RequestStartDraggingItem = RemoteEvents:FindFirstChild("RequestStartDraggingItem")
 StopDraggingItem = RemoteEvents:FindFirstChild("StopDraggingItem");UnequipItemHandle = RemoteEvents:WaitForChild("UnequipItemHandle")
-EquipItemHandle = RemoteEvents:FindFirstChild("EquipItemHandle");ToolDamageObject = RemoteEvents:WaitForChild("ToolDamageObject")
+EquipItemHandle = RemoteEvents:WaitForChild("RemoteEvents"):WaitForChild("EquipItemHandle");ToolDamageObject = RemoteEvents:WaitForChild("ToolDamageObject")
 RequestHotbarItem = RemoteEvents:FindFirstChild("RequestHotbarItem");RequestConsumeItem = RemoteEvents:FindFirstChild("RequestConsumeItem")
+RequestBagStoreItem = RemoteEvents:WaitForChild("RemoteEvents"):WaitForChild("RequestBagStoreItem")
+RequestBagDropItem = RemoteEvents:WaitForChild("RemoteEvents"):WaitForChild("RequestBagDropItem")
+ItemBag = player:WaitForChild("ItemBag")
 Foliage = Map:WaitForChild("Foliage")
 PlayerAxe = nil ;Auto_FOOD = false ;DontEquipTool = false
 local function EquipAxe()
@@ -912,30 +915,40 @@ SetSlider4(Bring_Count_SlideBar, Bring_Count_Bar, Bring_Count, Bring_Count_Color
 
 local isRunning = {food = false,fuel = false,scrap = false,weapon = false}
 local OldCFrame_Bring = HMNRT.CFrame
+local Sack_Space_Count = 5
+
+local function EquipSack(Tool)
+	local NewTool = Tool:Clone()
+	local OldAxe_WeldConstraint = Instance.new("WeldConstraint", NewTool.PrimaryPart)
+	NewTool.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(1.2,1.2,-2)
+	OldAxe_WeldConstraint.Part0 = NewTool.PrimaryPart
+	OldAxe_WeldConstraint.Part1 = HMNRT
+	EquipItemHandle:FireServer("FireAllClients",Tool)
+	NewTool.Parent = character
+	for _, item in ipairs(NewTool:GetChildren()) do
+		if item:IsA("BasePart") then
+			item.Transparency = 1
+		end
+	end
+end
 
 local function BringItemWithItem2(item2)
 	pcall(function()
 		if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then return end
 		humanoid.HipHeight = 16
 		
-		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(math.random(-3,3),16,math.random(-3,3))
-		wait(FastBring_Delay)
-		wait(FastBring_Delay)
 		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
 		wait(FastBring_Delay)
-		wait(FastBring_Delay)
-
+		RequestBagStoreItem:InvokeServer(Sack_Have,item2)
+		
 		if item2.Name == "Berry" and item2.Name == "Carrot" then
-			for i=1,5 do
+			for i=1,6 do
 				if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then return end
 				pcall(function()
-					wait(FastBring_Delay)
 					RequestStartDraggingItem:FireServer(item2)
-					wait(FastBring_Delay)
+					wait(0.03)
 				end)
 			end
-		else
-			RequestStartDraggingItem:FireServer(item2)
 		end
 
 		if Target == "Character" then
@@ -951,21 +964,60 @@ local function BringItemWithItem2(item2)
 			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(0,15,0)
 		end
-
-		HMNRT.CFrame = OldCFrame_Bring
-		wait(FastBring_Delay)
-		StopDraggingItem:FireServer(item2)
-		wait(FastBring_Delay)
-		StopDraggingItem:FireServer(item2)
-		wait(FastBring_Delay)
-		StopDraggingItem:FireServer(item2)
-		
+		RequestBagDropItem:FireServer(Sack_Have,item2)
 		humanoid.HipHeight = 0
 	end)
 end
 
 local function CreateStoppableBringFunction(itemType, itemList, button, buttonText, normalText, runningText)
 	button.Activated:Connect(function()
+		local Sack_Have = nil
+		local Equiped_Sack = false
+		
+		if Sack_Have.Name == "Old Sack" then
+			Sack_Space_Count = 5
+		elseif Sack_Have.Name == "Good Sack" then
+			Sack_Space_Count = 15
+		elseif Sack_Have.Name == "Giant Sack" then
+			Sack_Space_Count = 25
+		end
+		
+		repeat
+			if Inventory:FindFirstChild("Old Sack") then
+				Sack_Have = Inventory:FindFirstChild("Old Sack")
+			elseif Inventory:FindFirstChild("Good Sack") then
+				Sack_Have = Inventory:FindFirstChild("Good Sack")
+			elseif Inventory:FindFirstChild("Giant Sack") then
+				Sack_Have = Inventory:FindFirstChild("Giant Sack")
+			end
+			if Sack_Have then
+				if character:FindFirstChildOfClass("Tool") then
+					local ToolHolding = character:FindFirstChildOfClass("Tool")
+					if not matchesAllowedKeyword(ToolHolding.Name, {"Old Sack", "Good Sack", "Giant Sack"}) then
+						EquipSack(Sack_Have)
+						Equiped_Sack = true
+					end
+				else
+					if Sack_Have then
+						EquipSack(Sack_Have)
+						Equiped_Sack = true
+					end
+				end
+			end
+			wait(0.5)
+		until Sack_Have ~= nil and Equiped_Sack == true
+		
+		repeat
+			if #ItemBag:GetChildren() == Sack_Space_Count then
+				local Item = ItemBag:FindFirstChildOfClass("Model")
+				Item.PrimaryPart.CFrame = HMNRT.CFrame
+				RequestBagDropItem:FireServer(Sack_Have,Item)
+				wait(0.1)
+			end
+		until #ItemBag:GetChildren() < Sack_Space_Count
+		
+		----***** Check only *****------
+		
 		if isRunning[itemType] then
 			isRunning[itemType] = false
 			buttonText.Text = normalText
@@ -997,7 +1049,7 @@ local function CreateStoppableBringFunction(itemType, itemList, button, buttonTe
 						end
 					end
 				end
-
+				wait()
 				HMNRT.CFrame = OldCFrame_Bring
 				isRunning[itemType] = false
 				buttonText.Text = normalText
@@ -1609,7 +1661,7 @@ task.spawn(function()
 	local ToolDamageObject = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("ToolDamageObject")
 	while wait(1) do
 		if KillAura == true then
-			
+
 			if Inventory:FindFirstChild("Spear") then
 				if not character:FindFirstChild("Spear") then
 					if character:FindFirstChild("Old Axe") then
@@ -1722,7 +1774,7 @@ task.spawn(function()
 end)
 task.spawn(function()
 	local HungerBar = plrGui:WaitForChild("Interface"):WaitForChild("StatBars"):WaitForChild("HungerBar"):FindFirstChild("Bar")
-	while wait(0.5) do
+	while wait(1) do
 		if AutoFillHunger == true then
 			if HungerBar and HungerBar.Size.X.Scale < 0.8 then
 				Auto_FOOD = true
