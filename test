@@ -19,7 +19,7 @@ DashedLine = Map:WaitForChild("Campground"):WaitForChild("Scrapper"):WaitForChil
 RemoteEvents = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents")
 RequestStartDraggingItem = RemoteEvents:FindFirstChild("RequestStartDraggingItem")
 StopDraggingItem = RemoteEvents:FindFirstChild("StopDraggingItem");UnequipItemHandle = RemoteEvents:WaitForChild("UnequipItemHandle")
-EquipItemHandle = RemoteEvents:WaitForChild("RemoteEvents"):WaitForChild("EquipItemHandle");ToolDamageObject = RemoteEvents:WaitForChild("ToolDamageObject")
+EquipItemHandle = RemoteEvents:WaitForChild("RemoteEvents"):WaitForChild("EquipItemHandle"):WaitForChild("EquipItemHandle");ToolDamageObject = RemoteEvents:WaitForChild("ToolDamageObject")
 RequestHotbarItem = RemoteEvents:FindFirstChild("RequestHotbarItem");RequestConsumeItem = RemoteEvents:FindFirstChild("RequestConsumeItem")
 RequestBagStoreItem = RemoteEvents:WaitForChild("RemoteEvents"):WaitForChild("RequestBagStoreItem")
 RequestBagDropItem = RemoteEvents:WaitForChild("RemoteEvents"):WaitForChild("RequestBagDropItem")
