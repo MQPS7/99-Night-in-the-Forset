@@ -951,17 +951,18 @@ local function BringItemWithItem2(item2)
 		
 		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
 		wait(FastBring_Delay)
-		RequestBagStoreItem:InvokeServer(Sack_Have,item2)
 		
 		if item2.Name == "Berry" and item2.Name == "Carrot" then
-			for i=1,6 do
+			for i=1,5 do
 				if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then return end
 				pcall(function()
 					RequestStartDraggingItem:FireServer(item2)
-					wait(0.03)
+					wait(0.1)
 				end)
 			end
 		end
+		
+		RequestBagStoreItem:InvokeServer(Sack_Have,item2)
 
 		if Target == "Character" then
 			wait(FastBring_Delay)
@@ -976,8 +977,11 @@ local function BringItemWithItem2(item2)
 			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(0,15,0)
 		end
+		
 		RequestBagDropItem:FireServer(Sack_Have,item2)
+		
 		humanoid.HipHeight = 0
+		
 	end)
 end
 
@@ -1719,11 +1723,12 @@ task.spawn(function()
 								if OnTopEnameis == true and RootPart then
 									HMNRT.CFrame = RootPart.CFrame * CFrame.new(0,67,0)
 								end
-								if RootPart and ToolDamageObject and PlayerAxe then
-									if SpearUser == nil then
+								if RootPart and ToolDamageObject then
+									if PlayerAxe then
 										local Kill_args = {obj,PlayerAxe,"9_989989898",CFrame.new(RootPart.Position.X, RootPart.Position.Y, RootPart.Position.Z, 0, 0, 0, 2, 0, 0, 0, -0.2, 0.6)}
 										ToolDamageObject:InvokeServer(unpack(Kill_args))
-									else
+									end
+									if SpearUser then
 										local Kill_args = {obj,SpearUser,"9_989989898",CFrame.new(RootPart.Position.X, RootPart.Position.Y, RootPart.Position.Z, 0, 0, 0, 2, 0, 0, 0, -0.2, 0.6)}
 										ToolDamageObject:InvokeServer(unpack(Kill_args))
 									end
@@ -1732,7 +1737,7 @@ task.spawn(function()
 						end
 					end	
 				end
-				wait(0.3)
+				wait(0.1)
 			until KillAura == false
 		end
 	end
