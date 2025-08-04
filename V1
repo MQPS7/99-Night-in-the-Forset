@@ -37,20 +37,18 @@ Foliage = Map:WaitForChild("Foliage")
 
 PlayerAxe = nil ;Auto_FOOD = false ;DontEquipTool = false
 local function EquipAxe()
-	local AxeFound = nil
 	if character:FindFirstChild("Spear") then
 		character:FindFirstChild("Spear"):Destroy()
 	end
 	if Inventory:FindFirstChild("Old Axe") then
-		AxeFound = Inventory:FindFirstChild("Old Axe")
+		PlayerAxe = Inventory:FindFirstChild("Old Axe")
 	elseif Inventory:FindFirstChild("Good Axe") then
-		AxeFound = Inventory:FindFirstChild("Good Axe")
+		PlayerAxe = Inventory:FindFirstChild("Good Axe")
 	elseif Inventory:FindFirstChild("Strong Axe") then
-		AxeFound = Inventory:FindFirstChild("Strong Axe")
+		PlayerAxe = Inventory:FindFirstChild("Strong Axe")
 	end
-	PlayerAxe = AxeFound
-	local Old_Axe_args = {"FireAllClients",AxeFound}
-	local NewOld_Axe = AxeFound:Clone()
+	local Old_Axe_args = {"FireAllClients",PlayerAxe}
+	local NewOld_Axe = PlayerAxe:Clone()
 	local OldAxe_WeldConstraint = Instance.new("WeldConstraint", NewOld_Axe.PrimaryPart)
 	NewOld_Axe.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(1.2,1.2,-2)
 	OldAxe_WeldConstraint.Part0 = NewOld_Axe.PrimaryPart
@@ -62,6 +60,7 @@ local function EquipAxe()
 			item.Transparency = 1
 		end
 	end
+	return NewOld_Axe
 end
 local function MakeDraggableButton(button: ImageButton, MoveFrame)
 	local dragging = false;	local dragStart
@@ -266,7 +265,7 @@ gradient_IconLoad = Instance.new("UIGradient", LoadingIcon); gradient_IconLoad.R
 LoadingFrame.ZIndex = 2;LoadingBar1.ZIndex = 3;LoadingBar2.ZIndex = 4;LoadingText.ZIndex = 3;LoadingIcon.ZIndex = 3; gradient_IconLoad.Offset = Vector2.new(0, -1.5)
 IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.1.4")
+VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.1.4h")
 FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -821,20 +820,6 @@ KillAura_Button.Activated:Connect(function()
 		KillAura = true
 	else
 		KillAura = false
-		repeat
-			if character:FindFirstChild("Old Axe") then
-				character:FindFirstChild("Old Axe"):Destroy()
-			elseif character:FindFirstChild("Good Axe") then
-				character:FindFirstChild("Good Axe"):Destroy()
-			elseif character:FindFirstChild("Strong Axe") then
-				character:FindFirstChild("Strong Axe"):Destroy()
-			end
-			if character:FindFirstChild("Spear") then
-				character:FindFirstChild("Spear"):Destroy()
-			end
-			wait(1)
-		until not character:FindFirstChild("Old Axe") and character:FindFirstChild("Good Axe") and character:FindFirstChild("Strong Axe") and character:FindFirstChild("Spear")
-		
 	end	
 end)
 
@@ -875,10 +860,12 @@ SetSlider5(Kill_Aura_SlideBar, Kill_Aura_Bar, Kill_Aura_Dis, Kill_Aura_Color)
 task.spawn(function()
 	local ToolDamageObject = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("ToolDamageObject")
 	while wait(1) do
+		local AxeUsing = nil
 		if KillAura == true then
-			
-			if not character:FindFirstChild("ToolHandle") then
-				EquipAxe()
+
+			if not character:FindFirstChild(PlayerAxe.Name) then
+				print("ST - EquipAxe() ")
+				AxeUsing = EquipAxe()
 			end
 
 			repeat
@@ -901,6 +888,9 @@ task.spawn(function()
 				end
 				wait(0.2)
 			until KillAura == false
+			if AxeUsing then
+				AxeUsing:Destroy()
+			end
 		end
 	end
 end)
@@ -971,45 +961,29 @@ local function SetSlider4(Bar, Slide, Defalse_Value, Color)
 end
 SetSlider4(Bring_Count_SlideBar, Bring_Count_Bar, Bring_Count, Bring_Count_Color)
 
-local isRunning = {food = false,fuel = false,scrap = false,weapon = false}
+local isRunning = {food = false,fuel = false,scrap = false,weapon = false,Custom = false}
 local OldCFrame_Bring = HMNRT.CFrame
-local Sack_Space_Count = 5
-local Sack_Have = nil
-local function EquipSack(Tool)
-	local NewTool = Tool:Clone()
-	local OldAxe_WeldConstraint = Instance.new("WeldConstraint", NewTool.PrimaryPart)
-	NewTool.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(1.2,1.2,-2)
-	OldAxe_WeldConstraint.Part0 = NewTool.PrimaryPart
-	OldAxe_WeldConstraint.Part1 = HMNRT
-	EquipItemHandle:FireServer("FireAllClients",Tool)
-	NewTool.Parent = character
-	for _, item in ipairs(NewTool:GetChildren()) do
-		if item:IsA("BasePart") then
-			item.Transparency = 1
-		end
-	end
-end
-
+local Bring_HipHeight = 7
 local function BringItemWithItem2(item2)
 	pcall(function()
-		if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then return end
-		humanoid.HipHeight = 16
-		
-		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
+		if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon or isRunning.Custom ) then return end
+		humanoid.HipHeight = Bring_HipHeight
+
+		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,Bring_HipHeight,0)
 		wait(FastBring_Delay)
 		wait(FastBring_Delay)
-		
+
 		if item2.Name == "Berry" and item2.Name == "Carrot" then
 			for i=1,5 do
-				if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon) then return end
+				if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon or isRunning.Custom ) then return end
 				pcall(function()
 					RequestStartDraggingItem:FireServer(item2)
 					wait(0.13)
 				end)
 			end
 		end
-		
-		RequestBagStoreItem:InvokeServer(Sack_Have,item2)
+
+		RequestStartDraggingItem:FireServer(item2)
 		wait(FastBring_Delay)
 		wait(FastBring_Delay)
 
@@ -1023,68 +997,21 @@ local function BringItemWithItem2(item2)
 			item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(0,15,0)
 		end
 		wait(FastBring_Delay)
-		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
+		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,Bring_HipHeight,0)
 		wait(FastBring_Delay)
 		wait(FastBring_Delay)
-		RequestBagDropItem:FireServer(Sack_Have,item2)
+		StopDraggingItem:FireServer(item2)
 		wait(FastBring_Delay)
+		StopDraggingItem:FireServer(item2)
 		wait(FastBring_Delay)
-		humanoid.HipHeight = 0
 		
+		humanoid.HipHeight = Bring_HipHeight
 	end)
 end
 
 local function CreateStoppableBringFunction(itemType, itemList, button, buttonText, normalText, runningText)
 	button.Activated:Connect(function()
-		local Equiped_Sack = false
-		local Using_Sack = nil
-				
-		repeat
-			if Inventory:FindFirstChild("Old Sack") then
-				Sack_Have = Inventory:FindFirstChild("Old Sack")
-			elseif Inventory:FindFirstChild("Good Sack") then
-				Sack_Have = Inventory:FindFirstChild("Good Sack")
-			elseif Inventory:FindFirstChild("Giant Sack") then
-				Sack_Have = Inventory:FindFirstChild("Giant Sack")
-			end
-			if Sack_Have then
-				if character:FindFirstChildOfClass("Tool") then
-					local ToolHolding = character:FindFirstChildOfClass("Tool")
-					if not matchesAllowedKeyword(ToolHolding.Name, {"Old Sack", "Good Sack", "Giant Sack"}) then
-						Using_Sack = EquipSack(Sack_Have)
-						Equiped_Sack = true
-					end
-				else
-					if Sack_Have then
-						Using_Sack = EquipSack(Sack_Have)
-						Equiped_Sack = true
-					end
-				end
-			end
-			wait(0.5)
-		until Sack_Have ~= nil and Equiped_Sack == true
-		
-		if Sack_Have then
-			if Sack_Have.Name == "Old Sack" then
-				Sack_Space_Count = 5
-			elseif Sack_Have.Name == "Good Sack" then
-				Sack_Space_Count = 15
-			elseif Sack_Have.Name == "Giant Sack" then
-				Sack_Space_Count = 25
-			end
-		end
-		
-		repeat
-			if #ItemBag:GetChildren() == Sack_Space_Count then
-				local Item = ItemBag:FindFirstChildOfClass("Model")
-				Item.PrimaryPart.CFrame = HMNRT.CFrame
-				RequestBagDropItem:FireServer(Sack_Have,Item)
-				wait(0.1)
-			end
-		until #ItemBag:GetChildren() < Sack_Space_Count
-		
-		----***** Check only *****------
-		
+
 		if isRunning[itemType] then
 			isRunning[itemType] = false
 			buttonText.Text = normalText
@@ -1122,9 +1049,6 @@ local function CreateStoppableBringFunction(itemType, itemList, button, buttonTe
 				buttonText.Text = normalText
 				button.Active = true
 			end)
-		end
-		if Using_Sack then
-			Using_Sack:Destroy()
 		end
 	end)
 end
@@ -1222,6 +1146,7 @@ local function ResetAllItemInServer()
 		if not ModeDrag_SelectFuntion:FindFirstChild("Reset_"..item.Name) then
 			local NewBring_Button = Create_Click(ModeDrag_SelectFuntion, item.Name, "Reset_")
 			NewBring_Button.Activated:Connect(function()
+				isRunning.Custom = true
 				OldCFrame_Bring = HMNRT.CFrame
 				local Bring_Count_Work = 0
 				for _, item2 in ipairs(Items:GetChildren()) do
@@ -1235,6 +1160,7 @@ local function ResetAllItemInServer()
 						end
 					end
 				end
+				isRunning.Custom = false
 				HMNRT.CFrame = OldCFrame_Bring
 			end)
 		end
@@ -1272,17 +1198,19 @@ TeleCamp_Button.Activated:Connect(function()
 	HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,7,0)
 end)
 
-local SetScriptTp_StrongHold = false; local SetScriptTp_CraftHunt = false ; local CheckDaleyStrongHoldTpButton = 5
+SetScriptTp_StrongHold = false;SetScriptTp_CraftHunt = false;SetScriptTp_AleinBase = false ;CheckDaleyStrongHoldTpButton = 5
+local TeleAleinBase_Button, AleinBaseTele_Button, TeleMainAleinBase_Button = Create_Click(ModeTeleport_SelectFuntion, "ฐานเอเลี่ยน 👽")
 local TeleStrongHold_Button, TeleTextMain_Button, TeleMainStrongHold_Button = Create_Click(ModeTeleport_SelectFuntion, "สตรองโฮลด์ 💎")
 local TeleCraftHunt_Button, CraftHuntTele_Button, TeleMainCraftHunt_Button = Create_Click(ModeTeleport_SelectFuntion, "ร้านขายเสื้อกันหนาว 👚")
 task.spawn(function()
 	TeleMainStrongHold_Button.Visible = false
 	TeleMainCraftHunt_Button.Visible = false
+	TeleMainAleinBase_Button.Visible = false
 	while wait(CheckDaleyStrongHoldTpButton) do
 		if Map then
-			if Map:FindFirstChild("Landmarks"):FindFirstChild("Stronghold") then
+			if Map:FindFirstChild("Landmarks"):FindFirstChild("Stronghold") and SetScriptTp_StrongHold == false then
 				local Stronghold = Map:FindFirstChild("Landmarks"):FindFirstChild("Stronghold")
-				if Stronghold and Stronghold.PrimaryPart and SetScriptTp_StrongHold == false then
+				if Stronghold and Stronghold.PrimaryPart then
 					TeleMainStrongHold_Button.Visible = true
 					SetScriptTp_StrongHold = true
 					TeleStrongHold_Button.Activated:Connect(function()
@@ -1291,9 +1219,9 @@ task.spawn(function()
 						end)
 					end)
 				end
-			elseif Map:FindFirstChild("Landmarks"):FindFirstChild("Snow Clothing Shop") then
+			elseif Map:FindFirstChild("Landmarks"):FindFirstChild("Snow Clothing Shop") and SetScriptTp_CraftHunt == false then
 				local Snow_Clothing_Shop = Map:FindFirstChild("Landmarks"):FindFirstChild("Snow Clothing Shop")
-				if Snow_Clothing_Shop and Snow_Clothing_Shop.PrimaryPart and SetScriptTp_CraftHunt == false then
+				if Snow_Clothing_Shop and Snow_Clothing_Shop.PrimaryPart then
 					TeleMainCraftHunt_Button.Visible = true
 					SetScriptTp_CraftHunt = true
 					TeleCraftHunt_Button.Activated:Connect(function()
@@ -1302,8 +1230,19 @@ task.spawn(function()
 						end)
 					end)
 				end
+			elseif Items:FindFirstChild("Alien Chest") and SetScriptTp_AleinBase == false then
+				local Alien_Chest = Items:FindFirstChild("Alien Chest")
+				if Alien_Chest and Alien_Chest.PrimaryPart then
+					TeleMainAleinBase_Button.Visible = true
+					SetScriptTp_AleinBase = true
+					TeleAleinBase_Button.Activated:Connect(function()
+						pcall(function()
+							HMNRT.CFrame = Alien_Chest.PrimaryPart.CFrame * CFrame.new(0,7,0)
+						end)
+					end)
+				end
 			end
-			if TeleMainStrongHold_Button.Visible == true and TeleMainCraftHunt_Button.Visible == true then
+			if TeleMainAleinBase_Button.Visible == true and TeleMainStrongHold_Button.Visible == true and TeleMainCraftHunt_Button.Visible == true then
 				CheckDaleyStrongHoldTpButton = 60
 			end
 		end
@@ -1746,22 +1685,8 @@ task.spawn(function()
 end)
 task.spawn(function()
 	local Warpped = false
-	while wait(0.5) do
-		if GobackToCampLowHealth == true then
-			if humanoid.Health < 30 then
-				if Warpped == false then
-					HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,7,0)
-					Warpped = true
-				end
-			else
-				Warpped = false
-			end
-		end
-	end
-end)
-task.spawn(function()
-	local Warpped = false
-	while wait(0.5) do
+	local Warpped2 = false
+	while wait(1) do
 		if GobackToCamp == true then
 			if Lighting.ClockTime > 18 then
 				if Warpped == false then
@@ -1770,6 +1695,16 @@ task.spawn(function()
 				end
 			else
 				Warpped = false
+			end
+		end
+		if GobackToCampLowHealth == true then
+			if humanoid.Health < 30 then
+				if Warpped2 == false then
+					HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,7,0)
+					Warpped2 = true
+				end
+			else
+				Warpped2 = false
 			end
 		end
 	end
