@@ -35,17 +35,20 @@ EquipItemHandle = RemoteEvents:FindFirstChild("EquipItemHandle")
 ItemBag = player:WaitForChild("ItemBag")
 Foliage = Map:WaitForChild("Foliage")
 
-PlayerAxe = nil ;Auto_FOOD = false ;DontEquipTool = false
+PlayerAxe = nil;AxeName = "Old Axe";Auto_FOOD = false ;DontEquipTool = false
 local function EquipAxe()
 	if character:FindFirstChild("Spear") then
 		character:FindFirstChild("Spear"):Destroy()
 	end
 	if Inventory:FindFirstChild("Old Axe") then
 		PlayerAxe = Inventory:FindFirstChild("Old Axe")
+		AxeName = "Old Axe"
 	elseif Inventory:FindFirstChild("Good Axe") then
 		PlayerAxe = Inventory:FindFirstChild("Good Axe")
+		AxeName = "Good Axe"
 	elseif Inventory:FindFirstChild("Strong Axe") then
 		PlayerAxe = Inventory:FindFirstChild("Strong Axe")
+		AxeName = "Strong Axe"
 	end
 	local Old_Axe_args = {"FireAllClients",PlayerAxe}
 	local NewOld_Axe = PlayerAxe:Clone()
@@ -265,7 +268,7 @@ gradient_IconLoad = Instance.new("UIGradient", LoadingIcon); gradient_IconLoad.R
 LoadingFrame.ZIndex = 2;LoadingBar1.ZIndex = 3;LoadingBar2.ZIndex = 4;LoadingText.ZIndex = 3;LoadingIcon.ZIndex = 3; gradient_IconLoad.Offset = Vector2.new(0, -1.5)
 IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.1.4h")
+VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.1.5")
 FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -862,31 +865,37 @@ task.spawn(function()
 	while wait(1) do
 		local AxeUsing = nil
 		if KillAura == true then
-
-			if not character:FindFirstChild(PlayerAxe.Name) then
-				print("ST - EquipAxe() ")
-				AxeUsing = EquipAxe()
-			end
-
+			AxeUsing = EquipAxe()
 			repeat
+				
+				if not character:FindFirstChild(AxeName) then
+					if AxeUsing then
+						AxeUsing:Destroy()
+					end
+					AxeUsing = EquipAxe()
+				end
+				
 				for _, obj in pairs(workspace.Characters:GetChildren()) do
 					if obj:IsA("Model") and obj:FindFirstChild("NPC") and obj:FindFirstChild("HumanoidRootPart") then
 						local dist = (obj.HumanoidRootPart.Position - HMNRT.Position).Magnitude
 						if dist <= Kill_Aura_Dis and KillAura == true and obj then
 							pcall(function()
+								local Humanoid_Enamies = obj:FindFirstChildOfClass("Humanoid")
 								local RootPart = obj:FindFirstChild("HumanoidRootPart")
 								if OnTopEnameis == true and RootPart then
 									HMNRT.CFrame = RootPart.CFrame * CFrame.new(0,67,0)
 								end
 								if RootPart and ToolDamageObject and PlayerAxe then
 									local Kill_args = {obj,PlayerAxe,"9_989989898",CFrame.new(RootPart.Position.X, RootPart.Position.Y, RootPart.Position.Z, 0, 0, 0, 2, 0, 0, 0, -0.2, 0.6)}
+									Humanoid_Enamies.Health = 0
 									ToolDamageObject:InvokeServer(unpack(Kill_args))
+									Humanoid_Enamies.Health = Humanoid_Enamies.Health - 100
 								end
 							end)
 						end
 					end	
 				end
-				wait(0.2)
+				wait(0.1)
 			until KillAura == false
 			if AxeUsing then
 				AxeUsing:Destroy()
@@ -1005,7 +1014,7 @@ local function BringItemWithItem2(item2)
 		StopDraggingItem:FireServer(item2)
 		wait(FastBring_Delay)
 		
-		humanoid.HipHeight = Bring_HipHeight
+		humanoid.HipHeight = 0
 	end)
 end
 
