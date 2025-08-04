@@ -266,7 +266,7 @@ gradient_IconLoad = Instance.new("UIGradient", LoadingIcon); gradient_IconLoad.R
 LoadingFrame.ZIndex = 2;LoadingBar1.ZIndex = 3;LoadingBar2.ZIndex = 4;LoadingText.ZIndex = 3;LoadingIcon.ZIndex = 3; gradient_IconLoad.Offset = Vector2.new(0, -1.5)
 IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.1.3a")
+VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.1.4")
 FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -997,6 +997,7 @@ local function BringItemWithItem2(item2)
 		
 		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
 		wait(FastBring_Delay)
+		wait(FastBring_Delay)
 		
 		if item2.Name == "Berry" and item2.Name == "Carrot" then
 			for i=1,5 do
@@ -1013,30 +1014,20 @@ local function BringItemWithItem2(item2)
 		wait(FastBring_Delay)
 
 		if Target == "Character" then
-			wait(FastBring_Delay)
-			HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
-			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = OldCFrame_Bring * CFrame.new(math.random(-3,3),3,-3 + math.random(-3,3))
 		elseif Target == "Craft" then
-			wait(FastBring_Delay)
-			HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
-			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = DashedLine.CFrame * CFrame.new(0,7,0)
 		elseif Target == "NearCamp" then
-			wait(FastBring_Delay)
-			HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
-			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(-20,2,0)			
 		elseif Target == "Fire" then
-			wait(FastBring_Delay)
-			HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
-			wait(FastBring_Delay)
 			item2.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(0,15,0)
 		end
-		
+		wait(FastBring_Delay)
+		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,16,0)
 		wait(FastBring_Delay)
 		wait(FastBring_Delay)
 		RequestBagDropItem:FireServer(Sack_Have,item2)
+		wait(FastBring_Delay)
 		wait(FastBring_Delay)
 		humanoid.HipHeight = 0
 		
@@ -1046,6 +1037,7 @@ end
 local function CreateStoppableBringFunction(itemType, itemList, button, buttonText, normalText, runningText)
 	button.Activated:Connect(function()
 		local Equiped_Sack = false
+		local Using_Sack = nil
 				
 		repeat
 			if Inventory:FindFirstChild("Old Sack") then
@@ -1059,12 +1051,12 @@ local function CreateStoppableBringFunction(itemType, itemList, button, buttonTe
 				if character:FindFirstChildOfClass("Tool") then
 					local ToolHolding = character:FindFirstChildOfClass("Tool")
 					if not matchesAllowedKeyword(ToolHolding.Name, {"Old Sack", "Good Sack", "Giant Sack"}) then
-						EquipSack(Sack_Have)
+						Using_Sack = EquipSack(Sack_Have)
 						Equiped_Sack = true
 					end
 				else
 					if Sack_Have then
-						EquipSack(Sack_Have)
+						Using_Sack = EquipSack(Sack_Have)
 						Equiped_Sack = true
 					end
 				end
@@ -1130,6 +1122,9 @@ local function CreateStoppableBringFunction(itemType, itemList, button, buttonTe
 				buttonText.Text = normalText
 				button.Active = true
 			end)
+		end
+		if Using_Sack then
+			Using_Sack:Destroy()
 		end
 	end)
 end
