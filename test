@@ -266,7 +266,7 @@ gradient_IconLoad = Instance.new("UIGradient", LoadingIcon); gradient_IconLoad.R
 LoadingFrame.ZIndex = 2;LoadingBar1.ZIndex = 3;LoadingBar2.ZIndex = 4;LoadingText.ZIndex = 3;LoadingIcon.ZIndex = 3; gradient_IconLoad.Offset = Vector2.new(0, -1.5)
 IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.1.4")
+VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.1.4f")
 FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -877,7 +877,8 @@ task.spawn(function()
 	while wait(1) do
 		if KillAura == true then
 			
-			if not character:FindFirstChild("ToolHandle") then
+			if not character:FindFirstChild(PlayerAxe.Name) then
+				print("ST - EquipAxe() ")
 				EquipAxe()
 			end
 
@@ -1222,11 +1223,14 @@ local function ResetAllItemInServer()
 		if not ModeDrag_SelectFuntion:FindFirstChild("Reset_"..item.Name) then
 			local NewBring_Button = Create_Click(ModeDrag_SelectFuntion, item.Name, "Reset_")
 			NewBring_Button.Activated:Connect(function()
+				print("NewBring_Button.Activated")
 				OldCFrame_Bring = HMNRT.CFrame
 				local Bring_Count_Work = 0
 				for _, item2 in ipairs(Items:GetChildren()) do
 					if item2.Name == item.Name and item2.PrimaryPart then
+						print("1 s")
 						if Bring_Count_Work < Bring_Count then
+							print("2 s")
 							BringItemWithItem2(item2)
 							Bring_Count_Work = Bring_Count_Work + 1
 						end
@@ -1272,17 +1276,19 @@ TeleCamp_Button.Activated:Connect(function()
 	HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,7,0)
 end)
 
-local SetScriptTp_StrongHold = false; local SetScriptTp_CraftHunt = false ; local CheckDaleyStrongHoldTpButton = 5
+SetScriptTp_StrongHold = false;SetScriptTp_CraftHunt = false;SetScriptTp_AleinBase = false ;CheckDaleyStrongHoldTpButton = 5
+local TeleAleinBase_Button, AleinBaseTele_Button, TeleMainAleinBase_Button = Create_Click(ModeTeleport_SelectFuntion, "ฐานเอเลี่ยน 👽")
 local TeleStrongHold_Button, TeleTextMain_Button, TeleMainStrongHold_Button = Create_Click(ModeTeleport_SelectFuntion, "สตรองโฮลด์ 💎")
 local TeleCraftHunt_Button, CraftHuntTele_Button, TeleMainCraftHunt_Button = Create_Click(ModeTeleport_SelectFuntion, "ร้านขายเสื้อกันหนาว 👚")
 task.spawn(function()
 	TeleMainStrongHold_Button.Visible = false
 	TeleMainCraftHunt_Button.Visible = false
+	TeleMainAleinBase_Button.Visible = false
 	while wait(CheckDaleyStrongHoldTpButton) do
 		if Map then
-			if Map:FindFirstChild("Landmarks"):FindFirstChild("Stronghold") then
+			if Map:FindFirstChild("Landmarks"):FindFirstChild("Stronghold") and SetScriptTp_StrongHold == false then
 				local Stronghold = Map:FindFirstChild("Landmarks"):FindFirstChild("Stronghold")
-				if Stronghold and Stronghold.PrimaryPart and SetScriptTp_StrongHold == false then
+				if Stronghold and Stronghold.PrimaryPart then
 					TeleMainStrongHold_Button.Visible = true
 					SetScriptTp_StrongHold = true
 					TeleStrongHold_Button.Activated:Connect(function()
@@ -1291,9 +1297,9 @@ task.spawn(function()
 						end)
 					end)
 				end
-			elseif Map:FindFirstChild("Landmarks"):FindFirstChild("Snow Clothing Shop") then
+			elseif Map:FindFirstChild("Landmarks"):FindFirstChild("Snow Clothing Shop") and SetScriptTp_CraftHunt == false then
 				local Snow_Clothing_Shop = Map:FindFirstChild("Landmarks"):FindFirstChild("Snow Clothing Shop")
-				if Snow_Clothing_Shop and Snow_Clothing_Shop.PrimaryPart and SetScriptTp_CraftHunt == false then
+				if Snow_Clothing_Shop and Snow_Clothing_Shop.PrimaryPart then
 					TeleMainCraftHunt_Button.Visible = true
 					SetScriptTp_CraftHunt = true
 					TeleCraftHunt_Button.Activated:Connect(function()
@@ -1302,8 +1308,19 @@ task.spawn(function()
 						end)
 					end)
 				end
+			elseif Items:FindFirstChild("Alien Chest") and SetScriptTp_AleinBase == false then
+				local Alien_Chest = Items:FindFirstChild("Alien Chest")
+				if Alien_Chest and Alien_Chest.PrimaryPart then
+					TeleMainAleinBase_Button.Visible = true
+					SetScriptTp_AleinBase = true
+					TeleAleinBase_Button.Activated:Connect(function()
+						pcall(function()
+							HMNRT.CFrame = Alien_Chest.PrimaryPart.CFrame * CFrame.new(0,7,0)
+						end)
+					end)
+				end
 			end
-			if TeleMainStrongHold_Button.Visible == true and TeleMainCraftHunt_Button.Visible == true then
+			if TeleMainAleinBase_Button.Visible == true and TeleMainStrongHold_Button.Visible == true and TeleMainCraftHunt_Button.Visible == true then
 				CheckDaleyStrongHoldTpButton = 60
 			end
 		end
@@ -1746,22 +1763,8 @@ task.spawn(function()
 end)
 task.spawn(function()
 	local Warpped = false
-	while wait(0.5) do
-		if GobackToCampLowHealth == true then
-			if humanoid.Health < 30 then
-				if Warpped == false then
-					HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,7,0)
-					Warpped = true
-				end
-			else
-				Warpped = false
-			end
-		end
-	end
-end)
-task.spawn(function()
-	local Warpped = false
-	while wait(0.5) do
+	local Warpped2 = false
+	while wait(1) do
 		if GobackToCamp == true then
 			if Lighting.ClockTime > 18 then
 				if Warpped == false then
@@ -1770,6 +1773,16 @@ task.spawn(function()
 				end
 			else
 				Warpped = false
+			end
+		end
+		if GobackToCampLowHealth == true then
+			if humanoid.Health < 30 then
+				if Warpped2 == false then
+					HMNRT.CFrame = InnerTouchZone.CFrame * CFrame.new(0,7,0)
+					Warpped2 = true
+				end
+			else
+				Warpped2 = false
 			end
 		end
 	end
