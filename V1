@@ -104,9 +104,7 @@ local function EquipWeapon()
 			end
 		end
 	end
-	
 	local Tool_SetInCha = SetToolCLient(WeaponGet)
-	
 	return Tool_SetInCha
 end
 
@@ -119,9 +117,7 @@ local function EquipAxe()
 			end
 		end
 	end
-
 	local Tool_SetInCha = SetToolCLient(PlayerAxe)
-
 	return Tool_SetInCha
 end
 
@@ -328,7 +324,7 @@ gradient_IconLoad = Instance.new("UIGradient", LoadingIcon); gradient_IconLoad.R
 LoadingFrame.ZIndex = 2;LoadingBar1.ZIndex = 3;LoadingBar2.ZIndex = 4;LoadingText.ZIndex = 3;LoadingIcon.ZIndex = 3; gradient_IconLoad.Offset = Vector2.new(0, -1.5)
 IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.1.6b")
+VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.1.6c")
 FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -921,7 +917,7 @@ task.spawn(function()
 	local ToolDamageObject = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("ToolDamageObject")
 	local Weapon = nil
 	local Weapon_InInventory = nil
-	
+	local FakeDied = false
 	while wait(1) do
 		if KillAura == true then
 			Weapon = EquipWeapon()
@@ -944,9 +940,13 @@ task.spawn(function()
 							obj.Name ~= "Lost Child4" and
 							obj.Name ~= "Pelt Trader" and
 							obj.Name ~= "Deer" then
+							FakeDied = false
 							if obj:IsA("Model") and obj:FindFirstChild("NPC") and obj:FindFirstChild("HumanoidRootPart") then
 								local dist = (obj.HumanoidRootPart.Position - HMNRT.Position).Magnitude
 								if dist <= Kill_Aura_Dis and KillAura == true and obj then
+									if dist < 50 then
+										FakeDied = true
+									end
 									local Humanoid_Enamies = obj:FindFirstChildOfClass("Humanoid")
 									local RootPart = obj:FindFirstChild("HumanoidRootPart")
 									if OnTopEnameis == true and RootPart then
@@ -956,10 +956,13 @@ task.spawn(function()
 										if obj:FindFirstChild("HealthBar") then
 											obj.HealthBar.Enabled = true
 										end
-										Humanoid_Enamies.Health = 0
-										ToolDamageObject:InvokeServer(obj,Weapon_InInventory,"9_989989898",CFrame.new(RootPart.Position))
-										Humanoid_Enamies.Health = 0
-										--print("Send Server Kill with "..Weapon_InInventory.Name)
+										if FakeDied == true then
+											Humanoid_Enamies.Health = 0
+											ToolDamageObject:InvokeServer(obj,Weapon_InInventory,"9_989989898",CFrame.new(RootPart.Position))
+											Humanoid_Enamies.Health = 0
+										else
+											ToolDamageObject:InvokeServer(obj,Weapon_InInventory,"9_989989898",CFrame.new(RootPart.Position))
+										end
 									end
 								end
 							end	
