@@ -675,13 +675,6 @@ local function SetSlider(Bar, Slide, Defalse_Value, Color)
 		end
 	end)
 end
-RunService.RenderStepped:Connect(function()
-	if humanoid then
-		pcall(function()
-			humanoid.WalkSpeed = WalkSpeed
-		end)
-	end
-end)
 SetSlider(PlayerSpeed_SlideBar, PlayerSpeed_Bar, Defalse_WalkSpeed, PlayerSpeed_Color)
 local function convertJumpHeightToPower(jumpHeight)
 	local gravity = workspace.Gravity
@@ -817,8 +810,8 @@ function Fly()
 	Human.PlatformStand = false
 	Human.AutoRotate = true
 end
-local ModePlayer2 = Create_Line(ModePlayer_SelectFuntion, "แสงและเงา 💡")
-local Nofog_Button = Create_Toggle(ModePlayer_SelectFuntion, "ปิดหมอก")
+local ModePlayer2 = Create_Line(ModePlayer_SelectFuntion, "แสงและเงา ִ໋🍃")
+local Nofog_Button = Create_Toggle(ModePlayer_SelectFuntion, "ปิดหมอก ☁")
 local Nofog = false;Nofog_Button.Activated:Connect(function()
 	if Nofog == false then
 		Nofog = true
@@ -828,13 +821,21 @@ local Nofog = false;Nofog_Button.Activated:Connect(function()
 		Lighting.FogStart = 50
 	end	
 end)
-local Brightness_Button = Create_Toggle(ModePlayer_SelectFuntion, "เพิ่มแสง")
+local Brightness_Button = Create_Toggle(ModePlayer_SelectFuntion, "เพิ่มแสง 💡")
 local Brightness = false;Brightness_Button.Activated:Connect(function()
 	if Brightness == false then
 		Brightness = true
 	else
 		Brightness = false
 		Lighting.Brightness = 1
+	end	
+end)
+local AlwaysDay_Button = Create_Toggle(ModePlayer_SelectFuntion, "เช้าตลอดเวลา ☀️")
+local AlwaysDay = false;AlwaysDay_Button.Activated:Connect(function()
+	if AlwaysDay == false then
+		AlwaysDay = true
+	else
+		AlwaysDay = false
 	end	
 end)
 ---------------- **** ModeFarm_SelectFuntion **** ----------------
@@ -951,14 +952,14 @@ task.spawn(function()
 									if OnTopEnameis == true and RootPart then
 										HMNRT.CFrame = RootPart.CFrame * CFrame.new(0,67,0)
 									end
-									if obj:FindFirstChild("HealthBar") then
-										obj.HealthBar.Enabled = true
-									end
 									if RootPart and ToolDamageObject and Weapon_InInventory then
+										if obj:FindFirstChild("HealthBar") then
+											obj.HealthBar.Enabled = true
+										end
 										Humanoid_Enamies.Health = 0
 										ToolDamageObject:InvokeServer(obj,Weapon_InInventory,"9_989989898",CFrame.new(RootPart.Position))
 										Humanoid_Enamies.Health = 0
-										print("Send Server Kill with "..Weapon_InInventory.Name)
+										--print("Send Server Kill with "..Weapon_InInventory.Name)
 									end
 								end
 							end	
@@ -1901,4 +1902,18 @@ task.spawn(function()
 			end
 		end
 	end
+end)
+RunService.RenderStepped:Connect(function()
+	pcall(function()
+		if humanoid then
+			humanoid.WalkSpeed = WalkSpeed
+		end
+		if Nofog == true then
+			Lighting.FogEnd = 5000
+			Lighting.FogStart = 5000
+		end
+		if AlwaysDay == true then
+			Lighting.ClockTime = 12
+		end
+	end)
 end)
