@@ -14,10 +14,18 @@ HMNRT = character:FindFirstChild("HumanoidRootPart")
 Camera = workspace.CurrentCamera
 plrGui = player.PlayerGui
 Inventory = player:WaitForChild("Inventory")
-ScreenGui = Instance.new("ScreenGui", plrGui)
-Items = workspace:WaitForChild("Items")
 
+ScreenGui = Instance.new("ScreenGui", plrGui)
 ScreenGui.Name = "SOMTANK-Script"
+
+if getgenv().MainUI then
+	getgenv().MainUI:Destroy()
+	getgenv().MainUI = ScreenGui
+	print("Delete Old UI")
+else
+	getgenv().MainUI = ScreenGui
+	print("Set New UI")
+end
 
 Map = workspace:WaitForChild("Map")
 InnerTouchZone = Map:WaitForChild("Campground"):WaitForChild("MainFire"):WaitForChild("InnerTouchZone")
@@ -33,38 +41,90 @@ RequestBagStoreItem = RemoteEvents:WaitForChild("RequestBagStoreItem")
 RequestBagDropItem = RemoteEvents:WaitForChild("RequestBagDropItem")
 EquipItemHandle = RemoteEvents:FindFirstChild("EquipItemHandle")
 ItemBag = player:WaitForChild("ItemBag")
+Items = workspace:WaitForChild("Items")
 Foliage = Map:WaitForChild("Foliage")
 
-PlayerAxe = nil;AxeName = "Old Axe";Auto_FOOD = false ;DontEquipTool = false
-local function EquipAxe()
-	if character:FindFirstChild("Spear") then
-		character:FindFirstChild("Spear"):Destroy()
-	end
-	if Inventory:FindFirstChild("Old Axe") then
-		PlayerAxe = Inventory:FindFirstChild("Old Axe")
-		AxeName = "Old Axe"
-	elseif Inventory:FindFirstChild("Good Axe") then
-		PlayerAxe = Inventory:FindFirstChild("Good Axe")
-		AxeName = "Good Axe"
-	elseif Inventory:FindFirstChild("Strong Axe") then
-		PlayerAxe = Inventory:FindFirstChild("Strong Axe")
-		AxeName = "Strong Axe"
-	end
-	local Old_Axe_args = {"FireAllClients",PlayerAxe}
-	local NewOld_Axe = PlayerAxe:Clone()
-	local OldAxe_WeldConstraint = Instance.new("WeldConstraint", NewOld_Axe.PrimaryPart)
-	NewOld_Axe.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(1.2,1.2,-2)
-	OldAxe_WeldConstraint.Part0 = NewOld_Axe.PrimaryPart
+PlayerWeapon = nil; WeaponName = "Old Axe"
+PlayerAxe = nil; AxeName = "Old Axe";Auto_FOOD = false ;DontEquipTool = false
+
+local function SetToolCLient(PlayerWeapon_InPut)
+	if not PlayerWeapon_InPut then return end
+	local Old_Axe_args = {"FireAllClients",PlayerWeapon_InPut}
+	local NewPlayerWeapon = PlayerWeapon_InPut:Clone()
+	local OldAxe_WeldConstraint = Instance.new("WeldConstraint", NewPlayerWeapon.PrimaryPart)
+	NewPlayerWeapon.PrimaryPart.CFrame = HMNRT.CFrame * CFrame.new(1.2,1.2,-2)
+	OldAxe_WeldConstraint.Part0 = NewPlayerWeapon.PrimaryPart
 	OldAxe_WeldConstraint.Part1 = HMNRT
 	EquipItemHandle:FireServer(unpack(Old_Axe_args))
-	NewOld_Axe.Parent = character
-	for _, item in ipairs(NewOld_Axe:GetChildren()) do
+	NewPlayerWeapon.Parent = character
+	for _, item in ipairs(NewPlayerWeapon:GetChildren()) do
 		if item:IsA("BasePart") then
 			item.Transparency = 1
 		end
 	end
-	return NewOld_Axe
+	return NewPlayerWeapon
 end
+
+local function WhatWeapon_InPlayer()
+	local WeaponGet = nil
+	for I,v in ipairs(Inventory:GetChildren()) do
+		if v:IsA("Model") then
+			if v:GetAttribute("ToolName") == "GenericSword" then
+				WeaponGet = v
+			end
+		end
+	end
+	if WeaponGet == nil then
+		for I,v in ipairs(Inventory:GetChildren()) do
+			if v:IsA("Model") then
+				if v:GetAttribute("ToolName") == "GenericAxe" then
+					WeaponGet = v
+				end
+			end
+		end
+	end
+	return WeaponGet
+end
+
+local function EquipWeapon()
+	local WeaponGet = nil
+	for I,v in ipairs(Inventory:GetChildren()) do
+		if v:IsA("Model") then
+			if v:GetAttribute("ToolName") == "GenericSword" then
+				WeaponGet = v
+			end
+		end
+	end
+	if WeaponGet == nil then
+		for I,v in ipairs(Inventory:GetChildren()) do
+			if v:IsA("Model") then
+				if v:GetAttribute("ToolName") == "GenericAxe" then
+					WeaponGet = v
+				end
+			end
+		end
+	end
+	
+	local Tool_SetInCha = SetToolCLient(WeaponGet)
+	
+	return Tool_SetInCha
+end
+
+local function EquipAxe()
+	for I,v in ipairs(Inventory:GetChildren()) do
+		if v:IsA("Model") then
+			if v:GetAttribute("ToolName") == "GenericAxe" or v:GetAttribute("ToolName") == "Chainsaw" then
+				PlayerAxe = v
+				AxeName = v.Name
+			end
+		end
+	end
+
+	local Tool_SetInCha = SetToolCLient(PlayerAxe)
+
+	return Tool_SetInCha
+end
+
 local function MakeDraggableButton(button: ImageButton, MoveFrame)
 	local dragging = false;	local dragStart
 	local startPos;	local firstPos
@@ -268,7 +328,7 @@ gradient_IconLoad = Instance.new("UIGradient", LoadingIcon); gradient_IconLoad.R
 LoadingFrame.ZIndex = 2;LoadingBar1.ZIndex = 3;LoadingBar2.ZIndex = 4;LoadingText.ZIndex = 3;LoadingIcon.ZIndex = 3; gradient_IconLoad.Offset = Vector2.new(0, -1.5)
 IconFrame = MakeImageLabel(MainFrame, UDim2.new(0, 32,0, 31), UDim2.new(0.017, 0,0.013, 0), 1, Color3.new(0.435294, 0.109804, 1), 0, "rbxassetid://80019916158199")
 TitleText = MakeText(MainFrame, UDim2.new(0, 112,0, 32), UDim2.new(0.118, 0,0.013, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "Somtank")
-VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.1.5")
+VersionText = MakeText(MainFrame, UDim2.new(0, 163,0, 20), UDim2.new(0.41, 0,0.054, 0), 1, Color3.new(0.466667, 0.286275, 1), true, "V0.1.6b")
 FOR_ICON = Instance.new("UIAspectRatioConstraint", IconFrame)
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 VersionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -605,20 +665,8 @@ local function SetSlider(Bar, Slide, Defalse_Value, Color)
 		slider_WalkSpeed.SetValue(Defalse_WalkSpeed)
 	end)	
 	task.spawn(function()
-		local Set_Stop = false
-		while wait(0.05) do
-			PlayerSpeed_ShowValue.Text = WalkSpeed--humanoid.WalkSpeed = WalkSpeed
-			local moveDirection = humanoid.MoveDirection
-			if moveDirection.Magnitude > 0 and tonumber(PlayerSpeed_ShowValue.Text) ~= Defalse_Value then
-				Set_Stop = true
-				local velocity = moveDirection.Unit * WalkSpeed
-				HMNRT.AssemblyLinearVelocity = Vector3.new(velocity.X, HMNRT.AssemblyLinearVelocity.Y, velocity.Z)
-			else
-				if Set_Stop == true then
-					HMNRT.AssemblyLinearVelocity = Vector3.new(0, HMNRT.AssemblyLinearVelocity.Y, 0)
-					Set_Stop = false
-				end
-			end
+		while wait(0.1) do
+			PlayerSpeed_ShowValue.Text = WalkSpeed
 			if tonumber(PlayerSpeed_ShowValue.Text) == Defalse_Value then
 				tweenButtonColor(Color, Color3.new(0.145098, 0.133333, 0.392157), 0.17)
 			else
@@ -627,6 +675,13 @@ local function SetSlider(Bar, Slide, Defalse_Value, Color)
 		end
 	end)
 end
+RunService.RenderStepped:Connect(function()
+	if humanoid then
+		pcall(function()
+			humanoid.WalkSpeed = WalkSpeed
+		end)
+	end
+end)
 SetSlider(PlayerSpeed_SlideBar, PlayerSpeed_Bar, Defalse_WalkSpeed, PlayerSpeed_Color)
 local function convertJumpHeightToPower(jumpHeight)
 	local gravity = workspace.Gravity
@@ -861,55 +916,59 @@ end
 SetSlider5(Kill_Aura_SlideBar, Kill_Aura_Bar, Kill_Aura_Dis, Kill_Aura_Color)
 
 task.spawn(function()
+	
 	local ToolDamageObject = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("ToolDamageObject")
+	local Weapon = nil
+	local Weapon_InInventory = nil
+	
 	while wait(1) do
-		local AxeUsing = nil
 		if KillAura == true then
-			AxeUsing = EquipAxe()
+			Weapon = EquipWeapon()
+			Weapon_InInventory = WhatWeapon_InPlayer()
 			repeat
 				
-				if not character:FindFirstChild(AxeName) then
-					if AxeUsing then
-						AxeUsing:Destroy()
+				if not character:FindFirstChild(WeaponName) then
+					if Weapon then
+						Weapon:Destroy()
 					end
-					AxeUsing = EquipAxe()
+					Weapon = EquipWeapon()
+					Weapon_InInventory = WhatWeapon_InPlayer()
 				end
 				
 				for _, obj in pairs(workspace.Characters:GetChildren()) do
-					local CanDamage = false
 					pcall(function()
-						for i=1,4 do
-							if obj.Name ~= "Lost Child" then
-								CanDamage = true
-							end
-							if obj.Name ~= "Deer" then
-								CanDamage = true
-							end
-							if obj.Name ~= "Lost Child"..i then
-								CanDamage = true
-							end
+						if obj.Name ~= "Lost Child" and
+							obj.Name ~= "Lost Child2" and
+							obj.Name ~= "Lost Child3" and
+							obj.Name ~= "Lost Child4" and
+							obj.Name ~= "Pelt Trader" and
+							obj.Name ~= "Deer" then
+							if obj:IsA("Model") and obj:FindFirstChild("NPC") and obj:FindFirstChild("HumanoidRootPart") then
+								local dist = (obj.HumanoidRootPart.Position - HMNRT.Position).Magnitude
+								if dist <= Kill_Aura_Dis and KillAura == true and obj then
+									local Humanoid_Enamies = obj:FindFirstChildOfClass("Humanoid")
+									local RootPart = obj:FindFirstChild("HumanoidRootPart")
+									if OnTopEnameis == true and RootPart then
+										HMNRT.CFrame = RootPart.CFrame * CFrame.new(0,67,0)
+									end
+									if obj:FindFirstChild("HealthBar") then
+										obj.HealthBar.Enabled = true
+									end
+									if RootPart and ToolDamageObject and Weapon_InInventory then
+										Humanoid_Enamies.Health = 0
+										ToolDamageObject:InvokeServer(obj,Weapon_InInventory,"9_989989898",CFrame.new(RootPart.Position))
+										Humanoid_Enamies.Health = 0
+										print("Send Server Kill with "..Weapon_InInventory.Name)
+									end
+								end
+							end	
 						end
-						if obj:IsA("Model") and obj:FindFirstChild("NPC") and obj:FindFirstChild("HumanoidRootPart") and CanDamage == true then
-							local dist = (obj.HumanoidRootPart.Position - HMNRT.Position).Magnitude
-							if dist <= Kill_Aura_Dis and KillAura == true and obj then
-								local Humanoid_Enamies = obj:FindFirstChildOfClass("Humanoid")
-								local RootPart = obj:FindFirstChild("HumanoidRootPart")
-								if OnTopEnameis == true and RootPart then
-									HMNRT.CFrame = RootPart.CFrame * CFrame.new(0,67,0)
-								end
-								if RootPart and ToolDamageObject and PlayerAxe then
-									Humanoid_Enamies.Health = 0
-									ToolDamageObject:InvokeServer(obj,PlayerAxe,"9_989989898",CFrame.new(RootPart.Position.X, RootPart.Position.Y, RootPart.Position.Z, 0, 0, 0, 0, 0, 0, 0, 0, 0))
-									Humanoid_Enamies.Health = 0
-								end
-							end
-						end	
 					end)
 				end
-				wait(0.1)
+				wait(0.5)
 			until KillAura == false
-			if AxeUsing then
-				AxeUsing:Destroy()
+			if Weapon then
+				Weapon:Destroy()
 			end
 		end
 	end
@@ -935,16 +994,16 @@ local TarFire_Button = Create_Click(ModeDrag_SelectFuntion, "กองไฟ")
 TarFire_Button.Activated:Connect(function()
 	Target = "Fire"
 end)
-local FastBring_Delay = 0.14
+local FastBring_Delay = 0.17
 local ModeDragLine_N1 = Create_Line(ModeDrag_SelectFuntion, "เพิ่มเติม ⚙️")
 local FastBring_Button = Create_Toggle(ModeDrag_SelectFuntion, "ดึงแบบเร็ว")
 local FastBring = false;FastBring_Button.Activated:Connect(function()
 	if FastBring == true then
 		FastBring = false
-		FastBring_Delay = 0.14
+		FastBring_Delay = 0.17
 	else
 		FastBring = true
-		FastBring_Delay = 0.08
+		FastBring_Delay = 0.1
 	end
 end)
 Bring_Count = 10 ;Max_Bring_Count = 100
@@ -992,7 +1051,8 @@ local function BringItemWithItem2(item2)
 		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,Bring_HipHeight,0)
 		wait(FastBring_Delay)
 		wait(FastBring_Delay)
-
+		wait(FastBring_Delay)
+		
 		if item2.Name == "Berry" and item2.Name == "Carrot" then
 			for i=1,5 do
 				if not (isRunning.food or isRunning.fuel or isRunning.scrap or isRunning.weapon or isRunning.Custom ) then return end
@@ -1004,6 +1064,7 @@ local function BringItemWithItem2(item2)
 		end
 
 		RequestStartDraggingItem:FireServer(item2)
+		wait(FastBring_Delay)
 		wait(FastBring_Delay)
 		wait(FastBring_Delay)
 
@@ -1020,11 +1081,11 @@ local function BringItemWithItem2(item2)
 		HMNRT.CFrame = CFrame.new(item2.PrimaryPart.Position) * CFrame.new(0,Bring_HipHeight,0)
 		wait(FastBring_Delay)
 		wait(FastBring_Delay)
-		StopDraggingItem:FireServer(item2)
 		wait(FastBring_Delay)
 		StopDraggingItem:FireServer(item2)
 		wait(FastBring_Delay)
-		
+		StopDraggingItem:FireServer(item2)
+		wait(FastBring_Delay)
 		humanoid.HipHeight = 0
 	end)
 end
@@ -1435,10 +1496,75 @@ end)
 
 ModeMoreLine_1 = Create_Line(ModeMore_SelectFuntion, "การมองเห็น 👁️")
 
+
+local MainColor = Color3.new(0.282353, 1, 0.243137)
+local MainText = "ผมไม่รู้"
+local function ChestESP(item2)
+	if item2.Name == "Item Chest" then
+		MainColor = Color3.new(0.4, 0.231373, 0.137255)
+		MainText = "กล่องธรรมดา"
+	elseif item2.Name == "Item Chest2" then
+		MainColor = Color3.new(0.352941, 0.611765, 1)
+		MainText = "กล่องดี"
+	elseif item2.Name == "Item Chest3" then
+		MainColor = Color3.new(0.658824, 0.658824, 0.658824)
+		MainText = "กล่องเหล็ก"
+	elseif item2.Name == "Item Chest4" then
+		MainColor = Color3.new(1, 0.854902, 0.270588)
+		MainText = "กล่องเทพ"
+	elseif item2.Name == "Item Chest5" then
+		MainColor = Color3.new(1, 0.882353, 0)
+		MainText = "กล่องทอง"
+	elseif item2.Name == "Item Chest6" then
+		MainColor = Color3.new(0.713725, 0, 0)
+		MainText = "กล่องแดง"
+	elseif item2.Name == "Alien Chest" then
+		MainColor = Color3.new(0, 0.713725, 0.262745)
+		MainText = "กล่องเอเลี่ยน"
+	end
+	local NewHi = Instance.new("Highlight", item2)
+	local NewBil = Instance.new("BillboardGui", item2)
+	local NewText = Instance.new("TextLabel", NewBil)
+	NewHi.Name = "SOmtankChestESP"
+	NewBil.Name = "SOmtankChestBil"
+	NewHi.OutlineTransparency = 1
+	NewHi.FillColor = MainColor
+	NewText.BackgroundTransparency = 1
+	NewText.TextColor3 = MainColor
+	NewText.Text = MainText
+	NewBil.Size = UDim2.new(0, 200,0, 50)
+	NewBil.SizeOffset = Vector2.new(0, 0.5)
+	NewBil.AlwaysOnTop = true
+	NewText.Size = UDim2.new(0, 200,0, 50)
+	NewText.TextYAlignment = Enum.TextYAlignment.Top
+	NewText.TextSize = 26
+	NewText.Font = Enum.Font.Highway
+	pcall(function()
+		repeat
+			wait(0.1)
+		until item2.PrimaryPart.ProximityAttachment.ProximityInteraction
+		local Prox = item2.PrimaryPart.ProximityAttachment.ProximityInteraction
+		Prox.Triggered:Connect(function()
+			if item2:FindFirstChild("SOmtankChestBil") and item2:FindFirstChild("SOmtankChestBil"):FindFirstChild("TextLabel") then
+				item2:FindFirstChild("SOmtankChestBil"):FindFirstChild("TextLabel").Text = MainText.." - เปิดแล้ว"
+			end
+		end)
+	end)
+end
+
+
 EspChest_Button = Create_Toggle(ModeMore_SelectFuntion, "มองทะลุหีบ")
 local EspChest = false;EspChest_Button.Activated:Connect(function()
 	if EspChest == false then
 		EspChest = true
+		for _, item2 in ipairs(Items:GetChildren()) do
+			if item2 and matchesAllowedKeyword(item2.Name, {"Chest"}) and item2:IsA("Model") then
+				if not item2:FindFirstChild("SOmtankChestESP") then
+					ChestESP(item2)
+				end
+			end
+			wait()
+		end
 	else
 		EspChest = false
 		for _, item2 in ipairs(Items:GetChildren()) do
@@ -1460,34 +1586,7 @@ task.spawn(function()
 			for _, item2 in ipairs(Items:GetChildren()) do
 				if item2 and matchesAllowedKeyword(item2.Name, {"Chest"}) and item2:IsA("Model") then
 					if not item2:FindFirstChild("SOmtankChestESP") then
-						local NewHi = Instance.new("Highlight", item2)
-						local NewBil = Instance.new("BillboardGui", item2)
-						local NewText = Instance.new("TextLabel", NewBil)
-						NewHi.Name = "SOmtankChestESP"
-						NewBil.Name = "SOmtankChestBil"
-						NewHi.OutlineTransparency = 1
-						NewHi.FillColor = Color3.new(0.407843, 0.352941, 1)
-						NewText.BackgroundTransparency = 1
-						NewText.TextColor3 = Color3.new(0.415686, 0.184314, 1)
-						NewText.Text = "Chest"
-						NewBil.Size = UDim2.new(0, 200,0, 50)
-						NewBil.SizeOffset = Vector2.new(0, 0.5)
-						NewBil.AlwaysOnTop = true
-						NewText.Size = UDim2.new(0, 200,0, 50)
-						NewText.TextYAlignment = Enum.TextYAlignment.Top
-						NewText.TextSize = 26
-						NewText.Font = Enum.Font.Highway
-						pcall(function()
-							repeat
-								wait(0.5)
-							until item2.PrimaryPart.ProximityAttachment.ProximityInteraction
-							local Prox = item2.PrimaryPart.ProximityAttachment.ProximityInteraction
-							Prox.Triggered:Connect(function()
-								if item2:FindFirstChild("SOmtankChestBil") and item2:FindFirstChild("SOmtankChestBil"):FindFirstChild("TextLabel") then
-									item2:FindFirstChild("SOmtankChestBil"):FindFirstChild("TextLabel").Text = "Chest - Opened"
-								end
-							end)
-						end)
+						ChestESP(item2)
 					end
 				end
 				wait()
@@ -1731,6 +1830,18 @@ task.spawn(function()
 end)
 task.spawn(function()
 	local HungerBar = plrGui:WaitForChild("Interface"):WaitForChild("StatBars"):WaitForChild("HungerBar"):FindFirstChild("Bar")
+	local function Eat_function(Model)
+		if Auto_FOOD == true and Model.PrimaryPart then
+			RequestStartDraggingItem:FireServer(Model)
+			wait(0.1)
+			RequestConsumeItem:InvokeServer(Model)
+			wait(0.1)
+			StopDraggingItem:FireServer(Model)
+			if HungerBar.Size.X.Scale > 0.9 then
+				Auto_FOOD = false
+			end
+		end
+	end
 	while wait(1) do
 		if AutoFillHunger == true then
 			if HungerBar and HungerBar.Size.X.Scale < 0.8 then
@@ -1747,29 +1858,11 @@ task.spawn(function()
 						if AutoFillHunger == true then
 							if Custom_Food == false then
 								if matchesAllowedKeyword(Model.Name, Auto_Food_Teble) then
-									if Auto_FOOD == true and Model.PrimaryPart then
-										RequestStartDraggingItem:FireServer(Model)
-										wait(0.1)
-										RequestConsumeItem:InvokeServer(Model)
-										wait(0.1)
-										StopDraggingItem:FireServer(Model)
-										if HungerBar.Size.X.Scale > 0.9 then
-											Auto_FOOD = false
-										end
-									end
+									Eat_function(Model)
 								end
 							else
 								if Drop_Food_Want_List:FindFirstChild(Model.Name) then
-									if Auto_FOOD == true and Model.PrimaryPart then
-										RequestStartDraggingItem:FireServer(Model)
-										wait(0.1)
-										RequestConsumeItem:InvokeServer(Model)
-										wait(0.1)
-										StopDraggingItem:FireServer(Model)
-										if HungerBar.Size.X.Scale > 0.9 then
-											Auto_FOOD = false
-										end
-									end
+									Eat_function(Model)
 								end
 							end
 						end
