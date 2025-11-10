@@ -26,6 +26,36 @@ repeat
 	task.wait()
 until game:IsLoaded()
 task.spawn(function()
+	task.wait(20)
+	if tonumber(game.PlaceId) == tonumber(79546208627805) then return end
+	pcall(function()
+		local Map = workspace:WaitForChild("Map")
+		local InnerTouchZone = Map:WaitForChild("Campground"):WaitForChild("MainFire"):WaitForChild("InnerTouchZone")
+		local RemoteEvents = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents")
+		local RequestStartDraggingItem = RemoteEvents:FindFirstChild("RequestStartDraggingItem")
+		local StopDraggingItem = RemoteEvents:FindFirstChild("StopDraggingItem")
+		while true do
+			for _, TargetName in ipairs({"Sapling", "Log", "Coal", "Fuel Canister", "Oil Barrel", "Biofuel"}) do
+				for _, ItemModel in ipairs(workspace:WaitForChild("Items"):GetChildren()) do
+					if ItemModel.Name == TargetName and ItemModel.PrimaryPart then
+						task.delay(0.1,function()
+							pcall(function()
+								ItemModel.PrimaryPart.CFrame = InnerTouchZone.CFrame * CFrame.new(0,7,0)
+								wait(0.4)
+								RequestStartDraggingItem:FireServer(ItemModel)
+								wait(0.4)
+								StopDraggingItem:FireServer(ItemModel)
+							end)
+						end)
+						task.wait(0.05)
+					end
+				end
+			end
+			task.wait(1)
+		end
+	end)
+end)
+task.spawn(function()
 	local RequestCollectCoints = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):FindFirstChild("RequestCollectCoints")
 	local RequestConsumeItem = game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("RequestConsumeItem")
 	while wait(1) do
