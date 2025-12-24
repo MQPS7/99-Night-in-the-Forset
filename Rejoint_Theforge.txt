@@ -1,0 +1,6 @@
+pcall(function()
+    queue_on_teleport([[
+    script_key=']]..script_key..[[';
+    loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/f33362516b313f61058a564e7c6392b3.lua"))()    
+    ]])
+end)
